@@ -1,4 +1,4 @@
-/*	SWFObject v2.0 beta3 <http://code.google.com/p/swfobject/>
+/*	SWFObject v2.0 beta4 <http://code.google.com/p/swfobject/>
 	Copyright (c) 2007 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
@@ -54,7 +54,7 @@ var swfobject = function() {
 					catch(e) {}
 				}
 			}
-			if (!fp6Crash && typeof a == "object") { // When ActiveX is disbled in IE, then "typeof a" returns object, however it is null in reality, so something like "typeof a.GetVariable" will crash the script
+			if (!fp6Crash && typeof a == "object") { // When ActiveX is disbled in IE, then "typeof a" returns "object", however it is "null" in reality, so something like "typeof a.GetVariable" will crash the script
 				try {
 					d = a.GetVariable("$version");  // Will crash fp6.0.21/23/29
 					if (d) {
@@ -353,17 +353,24 @@ var swfobject = function() {
 	function createSWF(attObj, parObj, el) {
 		if (ua.ie && ua.win) { // IE, the object element and W3C DOM methods do not combine: fall back to outerHTML
 			var att = "";
-			for (var i in attObj) { 
-				if (i == "data") {
-					parObj.movie = attObj[i];
+			for (var i in attObj) {
+				if (typeof attObj[i] == "string") { // Filter out prototype additions from other potential libraries, like Object.prototype.toJSONString = function() {}
+					if (i == "data") {
+						parObj.movie = attObj[i];
+					}
+					else if (i.toLowerCase() == "styleclass") { // 'class' is an ECMA4 reserved keyword
+						att += ' class="' + attObj[i] + '"';
+					}
+					else if (i != "classid") {
+						att += ' ' + i + '="' + attObj[i] + '"';
+					}
 				}
-				else if (i != "classid") {
-					att += ' ' + i + '="' + attObj[i] + '"';
-				} 
 			}
 			var par = "";
 			for (var j in parObj) {
-				par += '<param name="' + j + '" value="' + parObj[j] + '" />';
+				if (typeof parObj[j] == "string") { // Filter out prototype additions from other potential libraries
+					par += '<param name="' + j + '" value="' + parObj[j] + '" />';
+				}
 			}
 			el.outerHTML = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"' + att + '>' + par + '</object>';
 			fixObjectLeaks(); // This bug affects dynamic publishing only	
@@ -372,16 +379,23 @@ var swfobject = function() {
 			var e = document.createElement("embed");
 			e.setAttribute("type", "application/x-shockwave-flash");
 			for (var k in attObj) {
-				if (k == "data") {
-					e.setAttribute("src", attObj[k]);
-				}
-				else if (k != "classid") {
-					e.setAttribute(k, attObj[k]);
+				if (typeof attObj[k] == "string") {  // Filter out prototype additions from other potential libraries
+					if (k == "data") {
+						e.setAttribute("src", attObj[k]);
+					}
+					else if (k.toLowerCase() == "styleclass") { // 'class' is an ECMA4 reserved keyword
+						e.setAttribute("class", attObj[k]);
+					}
+					else if (k != "classid") { // Filter out IE specific attribute
+						e.setAttribute(k, attObj[k]);
+					}
 				}
 			}
 			for (var l in parObj) {
-				if (l != "movie") {
-					e.setAttribute(l, parObj[l]);
+				if (typeof parObj[l] == "string") { // Filter out prototype additions from other potential libraries
+					if (l != "movie") { // Filter out IE specific param element
+						e.setAttribute(l, parObj[l]);
+					}
 				}
 			}
 			el.parentNode.replaceChild(e, el);
@@ -390,12 +404,17 @@ var swfobject = function() {
 			var o = document.createElement("object");
 			o.setAttribute("type", "application/x-shockwave-flash");
 			for (var m in attObj) {
-				if (m != "classid") { // Filter out IE specific attribute
-					o.setAttribute(m, attObj[m]);
+				if (typeof attObj[m] == "string") {  // Filter out prototype additions from other potential libraries
+					if (m.toLowerCase() == "styleclass") { // 'class' is an ECMA4 reserved keyword
+						o.setAttribute("class", attObj[m]);
+					}
+					else if (m != "classid") { // Filter out IE specific attribute
+						o.setAttribute(m, attObj[m]);
+					}
 				}
 			}
 			for (var n in parObj) {
-				if (n != "movie") { // Filter out IE specific param element
+				if (typeof parObj[n] == "string" && n != "movie") { // Filter out prototype additions from other potential libraries and IE specific param element
 					createObjParam(o, n, parObj[n]);
 				}
 			}
@@ -467,11 +486,13 @@ var swfobject = function() {
 				var par = (typeof parObj == "object") ? parObj : {};
 				if (typeof flashvarsObj == "object") {
 					for (var i in flashvarsObj) {
-						if (typeof par.flashvars != "undefined") {
-							par.flashvars += "&" + i + "=" + flashvarsObj[i];
-						}
-						else {
-							par.flashvars = i + "=" + flashvarsObj[i];
+						if (typeof flashvarsObj[i] == "string") { // Filter out prototype additions from other potential libraries
+							if (typeof par.flashvars != "undefined") {
+								par.flashvars += "&" + i + "=" + flashvarsObj[i];
+							}
+							else {
+								par.flashvars = i + "=" + flashvarsObj[i];
+							}
 						}
 					}
 				}
