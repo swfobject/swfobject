@@ -1,4 +1,4 @@
-/*	SWFObject v2.0 beta4 <http://code.google.com/p/swfobject/>
+/*	SWFObject v2.0 beta5 <http://code.google.com/p/swfobject/>
 	Copyright (c) 2007 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
@@ -174,9 +174,7 @@ var swfobject = function() {
 	/* Main function
 		- Will preferably execute onDomLoad, otherwise onload (as a fallback)
 	*/
-	function main() {
-		fixOutOfMemoryError();
-		// Static publishing only
+	function main() { // Static publishing only
 		var rl = regObjArr.length;
 		for (var i = 0; i < rl; i++) { // For each registered object element
 			var id = regObjArr[i].id;
@@ -198,18 +196,6 @@ var swfobject = function() {
 			}
 			createCSS("#" + id, "visibility:visible");
 		}
-	}
-	
-	/* Fix the "Line 56: Out of Memory" error
-		- Occurs when unloading a web page in IE using fp9 and multiple SWFs using ExternalInterface
-	*/
-	function fixOutOfMemoryError() {
-		if (ua.ie && ua.win && hasPlayerVersion([9,0,0])) {
-			window.attachEvent("onbeforeunload", function() {
-				__flash_unloadHandler = function() {};
-				__flash_savedUnloadHandler = function() {};
-			});
-		}	
 	}
 	
 	/* Fix nested param elements, which are ignored by older webkit engines
@@ -522,6 +508,21 @@ var swfobject = function() {
 		hasFlashPlayerVersion: function(versionStr) {
 			return hasPlayerVersion(versionStr.split("."));
 		},
+		
+		createSWF: function(attObj, parObj, el) {
+			if (ua.w3cdom && isDomLoaded) {
+				createSWF(attObj, parObj, el);
+			}
+		},
+		
+		createCSS: function(sel, decl) {
+			if (ua.w3cdom) {
+				createCSS(sel, decl);
+			}
+		},
+		
+		addDomLoadEvent:addDomLoadEvent,
+		addLoadEvent:addLoadEvent,
 		
 		// For internal usage only
 		expressInstallCallback: function() {
