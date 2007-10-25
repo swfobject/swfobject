@@ -536,7 +536,7 @@ var swfobject = function() {
 			} 
 		},
 		
-		getQueryParamValue: function(key) {
+		getQueryParamValue: function(param) {
 			var q = document.location.search || document.location.hash;
 			if (param == null) { return q; }
 		 		if(q) {
