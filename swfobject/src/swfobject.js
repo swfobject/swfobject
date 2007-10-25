@@ -534,7 +534,21 @@ var swfobject = function() {
 					isExpressInstallActive = false;
 				}
 			} 
-		}	
+		},
+		
+		getQueryParamValue: function(key) {
+			var q = document.location.search || document.location.hash;
+			if (param == null) { return q; }
+		 		if(q) {
+					var pairs = q.substring(1).split("&");
+					for (var i=0; i < pairs.length; i++) {
+						if (pairs[i].substring(0, pairs[i].indexOf("=")) == param) {
+							return pairs[i].substring((pairs[i].indexOf("=")+1));
+						}
+					}
+				}
+			return "";
+		}
 	};
 	
 }();
