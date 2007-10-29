@@ -459,6 +459,23 @@ var swfobject = function() {
 			createCSS("#" + objectIdStr, "visibility:hidden");
 		},
 		
+		getObjectById: function(objectIdStr) {
+			var r = null;
+			if (ua.w3cdom && isDomLoaded) {
+				var o = document.getElementById(objectIdStr);
+				if (o) {
+					var n = o.getElementsByTagName("object")[0];
+					if (!n || (n && typeof o.SetVariable != "undefined")) {
+				    	r = o;
+					}
+					else if (typeof n.SetVariable != "undefined") {
+						r = n;
+					}
+				}
+			}
+			return r;
+		},
+		
 		embedSWF: function(swfUrlStr, replaceElemIdStr, widthStr, heightStr, swfVersionStr, xiSwfUrlStr, flashvarsObj, parObj, attObj) {
 			if (!ua.w3cdom || !swfUrlStr || !replaceElemIdStr || !widthStr || !heightStr || !swfVersionStr) {
 				return;
@@ -524,6 +541,22 @@ var swfobject = function() {
 		addDomLoadEvent:addDomLoadEvent,
 		addLoadEvent:addLoadEvent,
 		
+		getQueryParamValue: function(param) {
+			var q = document.location.search || document.location.hash;
+			if (param == null) {
+				return q;
+			}
+		 	if(q) {
+				var pairs = q.substring(1).split("&");
+				for (var i = 0; i < pairs.length; i++) {
+					if (pairs[i].substring(0, pairs[i].indexOf("=")) == param) {
+						return pairs[i].substring((pairs[i].indexOf("=") + 1));
+					}
+				}
+			}
+			return "";
+		},
+		
 		// For internal usage only
 		expressInstallCallback: function() {
 			if (isExpressInstallActive && storedAltContent) {
@@ -534,21 +567,8 @@ var swfobject = function() {
 					isExpressInstallActive = false;
 				}
 			} 
-		},
-		
-		getQueryParamValue: function(param) {
-			var q = document.location.search || document.location.hash;
-			if (param == null) { return q; }
-		 		if(q) {
-					var pairs = q.substring(1).split("&");
-					for (var i=0; i < pairs.length; i++) {
-						if (pairs[i].substring(0, pairs[i].indexOf("=")) == param) {
-							return pairs[i].substring((pairs[i].indexOf("=")+1));
-						}
-					}
-				}
-			return "";
 		}
+		
 	};
 	
 }();
