@@ -1,5 +1,5 @@
 /*	=============================
-	SWFFix <http://www.swffix.org>
+	SWFObject v2.0 <http://code.google.com/p/swfobject/>
 	Copyright (c) 2007 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 	=============================
@@ -47,7 +47,7 @@ function loadComplete(){
 }
 
 function loadTimeOut(){
-	callbackSWFFix();
+	callbackSWFObject();
 }
 
 function installStatus(statusValue){
@@ -60,17 +60,17 @@ function installStatus(statusValue){
 		break;
 		case "Download.Cancelled":
 			// The end user chose "NO" when prompted to install the new player.
-			// By default the SWFFix callback function is called to force alternative content.
-			callbackSWFFix();
+			// By default the SWFObject callback function is called to force alternative content.
+			callbackSWFObject();
 		break;
 		case "Download.Failed":
 			// The end user failed to download the installer due to a network failure.
-			// By default the SWFFix callback function is called to force alternative content.
-			callbackSWFFix();
+			// By default the SWFObject callback function is called to force alternative content.
+			callbackSWFObject();
 		break;
 	}
 }
 
-function callbackSWFFix(){
-	getURL("javascript:SWFFix.expressInstallCallback();");
+function callbackSWFObject(){
+	getURL("javascript:swfobject.expressInstallCallback();");
 }
