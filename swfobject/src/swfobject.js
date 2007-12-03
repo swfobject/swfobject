@@ -1,4 +1,4 @@
-/*	SWFObject v2.0 beta6 <http://code.google.com/p/swfobject/>
+/*	SWFObject v2.0 rc1 <http://code.google.com/p/swfobject/>
 	Copyright (c) 2007 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
@@ -142,7 +142,12 @@ var swfobject = function() {
 	}
 	
 	function addDomLoadEvent(fn) {
-		domLoadFnArr[domLoadFnArr.length] = fn; // Array.push() is only available in IE5.5+
+		if (isDomLoaded) {
+			fn();
+		}
+		else { 
+			domLoadFnArr[domLoadFnArr.length] = fn; // Array.push() is only available in IE5.5+
+		}
 	}
 	
 	/* Cross-browser onload
@@ -182,7 +187,7 @@ var swfobject = function() {
 				var obj = document.getElementById(id);
 				if (obj) {
 					if (hasPlayerVersion(regObjArr[i].swfVersion)) { // Flash plug-in version >= Flash content version: Houston, we have a match!
-						if (ua.webkit && ua.webkitVersion < 312) { // Older webkit engines ignore the object elementÕs nested param elements
+						if (ua.webkit && ua.webkitVersion < 312) { // Older webkit engines ignore the object element's nested param elements
 							fixParams(obj);
 						}
 					}
@@ -361,7 +366,7 @@ var swfobject = function() {
 			el.outerHTML = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"' + att + '>' + par + '</object>';
 			fixObjectLeaks(); // This bug affects dynamic publishing only	
 		}
-		else if (ua.webkit && ua.webkitVersion < 312) { // Older webkit engines ignore the object elementÕs nested param elements: fall back to the proprietary embed method
+		else if (ua.webkit && ua.webkitVersion < 312) { // Older webkit engines ignore the object element's nested param elements: fall back to the proprietary embed method
 			var e = document.createElement("embed");
 			e.setAttribute("type", "application/x-shockwave-flash");
 			for (var k in attObj) {
