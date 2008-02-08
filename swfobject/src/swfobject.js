@@ -392,6 +392,7 @@ var swfobject = function() {
 				}
 			}
 			el.parentNode.replaceChild(e, el);
+			el = e;
 		}
 		else { // Well-behaving browsers
 			var o = document.createElement("object");
@@ -412,6 +413,7 @@ var swfobject = function() {
 				}
 			}
 			el.parentNode.replaceChild(o, el);
+			el = o;
 		}
 		return el;
 	}
