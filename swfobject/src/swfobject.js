@@ -339,6 +339,7 @@ var swfobject = function() {
 	/* Cross-browser dynamic SWF creation
 	*/
 	function createSWF(attObj, parObj, id) {
+		var r;
 		var el = document.getElementById(id);
 		if (typeof attObj.id == "undefined") { // if no 'id' is defined for the object element, it will inherit the 'id' from the alternative content
 			attObj.id = id;
@@ -366,7 +367,7 @@ var swfobject = function() {
 			}
 			el.outerHTML = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"' + att + '>' + par + '</object>';
 			fixObjectLeaks(attObj.id); // This bug affects dynamic publishing only
-			el = document.getElementById(attObj.id);	
+			r = document.getElementById(attObj.id);	
 		}
 		else if (ua.webkit && ua.webkitVersion < 312) { // Older webkit engines ignore the object element's nested param elements: fall back to the proprietary embed element
 			var e = document.createElement("embed");
@@ -392,7 +393,7 @@ var swfobject = function() {
 				}
 			}
 			el.parentNode.replaceChild(e, el);
-			el = e;
+			r = e;
 		}
 		else { // Well-behaving browsers
 			var o = document.createElement("object");
@@ -413,9 +414,9 @@ var swfobject = function() {
 				}
 			}
 			el.parentNode.replaceChild(o, el);
-			el = o;
+			r = o;
 		}
-		return el;
+		return r;
 	}
 
 	function createObjParam(el, pName, pValue) {
