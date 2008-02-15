@@ -1,0 +1,752 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+	<head>
+		<title>SWFObject v2.0 HTML and JavaScript generator v1.0</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<!--
+		SWFObject v2.0 HTML and JavaScript generator  v1.0 <http://code.google.com/p/swfobject/>
+		Copyright (c) 2007 Geoff Stearns, Michael Williams, and Bobby van der Sluis
+		This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
+		-->
+		<style type="text/css" media="screen">
+			body { width:780px; }
+			.col1, .col2, .col3, .col4 { float:left; display:inline; }
+			.col1 { width:150px; }
+			.col2 { width:600px; }
+			.col3 { width:120px; }
+			.col4 { width:180px; }
+			.help, .clear { clear:left; }
+			div.clear { height:1px; }
+			#alternativeContent, #output { width:760px; }
+			#publishingMethodHelp, #alternativeContentHelp, #replaceIdHelp { display:none; width:700px; }
+			#toggleReplaceId, #isIdReq, #toggleAttsParamsContainer { display:none; }
+			
+			* { font-family:"Lucida Grande","Lucida Sans Unicode",Verdana,sans-serif; font-size:12px; line-height:21px; }
+			textarea { font-family:Courier, monospace; line-height:14px; }
+			div { vertical-align:text-bottom; }
+			fieldset { margin:6px 0; }
+			input { line-height:normal; }
+			h1 { font-size:18px; }
+			a { color:blue; }
+			.info { border-bottom:1px dotted #666; cursor:help; }
+			.req { color:red; }
+			.note { font-size:10px; color:#666; }
+			.help { margin:0 0 10px; padding:10px 10px 0;  border:1px solid #ccc; background-color:#ffc; }
+			.help h2, .help h3, .help p, .help ul, .help li { margin:0; font-size:11px; line-height:14px; }
+			.help h2, .help p, .help ul { padding-bottom:10px; }
+			.help h3 { color:#666; }
+		</style>
+		<script type="text/javascript">
+		//<![CDATA[
+			var flashvarsTotal = 1;
+			function generateOutput() {
+				var so = document.getElementById("swfobject").value;
+				var pm = document.getElementById("publishingMethod").selectedIndex; // 1 = dynamic, 0 = static
+				var swf = document.getElementById("swf").value;
+				var w = document.getElementById("width").value;
+				var h = document.getElementById("height").value;
+				var u = document.getElementById("unit").selectedIndex; // 1 = percentage, 0 = pixels
+				if (u) {
+					w += "%";
+					h += "%";
+				}
+				var maj = document.getElementById("major").value;
+				var min = document.getElementById("minor").value;
+				var rel = document.getElementById("release").value;
+				var xi = document.getElementById("expressInstall").checked;
+				var xis = document.getElementById("expressInstallSwf").value;
+				var rid = document.getElementById("replaceId").value;
+				var id = document.getElementById("attId").value;
+				var nam = document.getElementById("attName").value;
+				var cls = document.getElementById("attClass").value;
+				var ali = document.getElementById("align").value;
+				var pl = document.getElementById("play").value;
+				var lp = document.getElementById("loop").value;
+				var men = document.getElementById("menu").value;
+				var qua = document.getElementById("quality").value;
+				var sca = document.getElementById("scale").value;
+				var sal = document.getElementById("salign").value;
+				var wmd = document.getElementById("wmode").value;
+				var bgc = document.getElementById("bgcolor").value;
+				var dfn = document.getElementById("devicefont").value;
+				var stb = document.getElementById("seamlesstabbing").value;
+				var slc = document.getElementById("swliveconnect").value;
+				var afs = document.getElementById("allowfullscreen").value;
+				var asa = document.getElementById("allowscriptaccess").value;
+				var anw = document.getElementById("allownetworking").value;
+				var bas = document.getElementById("base").value;
+				var doct = document.getElementById("htmlTemplate").value;
+				var chen = document.getElementById("charEncoding").value;
+				var ac = document.getElementById("alternativeContent").value;
+				var o;
+				var e = " />";
+				if (doct == "html4transitional") {
+					o = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">";
+					o += "\n<html>";
+					e = ">";
+				}
+				else if (doct == "html4strict") {
+					o = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">";
+					o += "\n<html>";
+					e = ">";
+				}
+				else if (doct == "xhtml1transitional") {
+					o = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">";
+					o += "\n<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">";
+				}
+				else {
+					o = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">";
+					o += "\n<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">";
+				}
+				o += "\n\t<head>";
+				o += "\n\t\t<title></title>";
+				o += "\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=" + chen + "\"" + e;
+				o += "\n\t\t<scr" + "ipt type=\"text/javascript\" src=\"" + so + "\"></scr" + "ipt>";
+				o += "\n\t\t<scr" + "ipt type=\"text/javascript\">";
+				if (pm) {
+					o += "\n\t\t\tvar flashvars = {};";
+					for (var i = 1; i < flashvarsTotal + 1; i++) {
+						var fvName = document.getElementById("flashvarsName" + i).value;
+						var fvValue = document.getElementById("flashvarsValue" + i).value;
+						if (fvName != "" && fvValue != "") {
+							o += "\n\t\t\tflashvars." + fvName + " = \"" + fvValue + "\";";
+						}
+					}
+					o += "\n\t\t\tvar params = {};";
+					if (pl != "0") { o += "\n\t\t\tparams.play = \"" + pl + "\";"; }
+					if (lp != "0") { o += "\n\t\t\tparams.loop = \"" + lp + "\";"; }
+					if (men != "0") { o += "\n\t\t\tparams.menu = \"" + men + "\";"; }
+					if (qua != "0") { o += "\n\t\t\tparams.quality = \"" + qua + "\";"; }
+					if (sca != "0") { o += "\n\t\t\tparams.scale = \"" + sca + "\";"; }
+					if (sal != "0") { o += "\n\t\t\tparams.salign = \"" + sal + "\";"; }
+					if (wmd != "0") { o += "\n\t\t\tparams.wmode = \"" + wmd + "\";"; }
+					if (bgc != "") { o += "\n\t\t\tparams.bgcolor = \"" + bgc + "\";"; }
+					if (dfn != "0") { o += "\n\t\t\tparams.devicefont = \"" + dfn + "\";"; }
+					if (stb != "0") { o += "\n\t\t\tparams.seamlesstabbing = \"" + stb + "\";"; }
+					if (slc != "0") { o += "\n\t\t\tparams.swliveconnect = \"" + slc + "\";"; }
+					if (afs != "0") { o += "\n\t\t\tparams.allowfullscreen = \"" + afs + "\";"; }
+					if (asa != "0") { o += "\n\t\t\tparams.allowscriptaccess = \"" + asa + "\";"; }
+					if (anw != "0") { o += "\n\t\t\tparams.allownetworking = \"" + anw + "\";"; }
+					if (bas != "") { o += "\n\t\t\tparams.base = \"" + bas + "\";"; }
+					o += "\n\t\t\tvar attributes = {};";
+					if (id != "") { o += "\n\t\t\tattributes.id = \"" + id + "\";"; }
+					if (nam != "") { o += "\n\t\t\tattributes.name = \"" + nam + "\";"; }
+					if (cls != "") { o += "\n\t\t\tattributes.styleclass = \"" + cls + "\";"; }
+					if (ali != "0") { o += "\n\t\t\tattributes.align = \"" + ali + "\";"; }
+					var xiv = xi ? "\"" + xis + "\"" : false;
+					o += "\n\t\t\tswfobject.embedSWF(\"" + swf + "\", \"" + rid + "\", \"" + w + "\", \"" + h + "\", \"" + maj + "." + min + "." + rel + "\", " + xiv + ", flashvars, params, attributes);"
+				}
+				else {
+					var xiv = xi ? ", \"" + xis + "\"" : "";			
+					o += "\n\t\t\tswfobject.registerObject(\"" + id + "\", \"" + maj + "." + min + "." + rel + "\"" + xiv + ");";
+				}
+				o += "\n\t\t</scr" + "ipt>";
+				o += "\n\t</head>";
+				o += "\n\t<body>";
+				if (pm) {
+					o += "\n\t\t<div id=\"" + rid + "\">";
+					o += "\n\t\t\t" + ac.replace(/\n/g, "\n\t\t\t");
+					o += "\n\t\t</div>";
+				}
+				else {
+					var atts = "";
+					if (id != "") { atts += " id=\"" + id + "\""; }
+					if (nam != "") { atts += " name=\"" + nam + "\""; }
+					if (cls != "") { atts += " class=\"" + cls + "\""; }
+					if (ali != "0") { atts += " align=\"" + ali + "\""; }
+					o += "\n\t\t<div>";
+					o += "\n\t\t\t<object classid=\"clsid:D27CDB6E-AE6D-11cf-96B8-444553540000\" width=\"" + w + "\" height=\"" + h + "\"" + atts + ">";
+					o += "\n\t\t\t\t<param name=\"movie\" value=\"" + swf + "\"" + e;
+					if (pl != "0") { o += "\n\t\t\t\t<param name=\"play\" value=\"" + pl + "\"" + e; }
+					if (lp != "0") { o += "\n\t\t\t\t<param name=\"loop\" value=\"" + lp + "\"" + e; }
+					if (men != "0") { o += "\n\t\t\t\t<param name=\"menu\" value=\"" + men + "\"" + e; }
+					if (qua != "0") { o += "\n\t\t\t\t<param name=\"quality\" value=\"" + qua + "\"" + e; }
+					if (sca != "0") { o += "\n\t\t\t\t<param name=\"scale\" value=\"" + sca + "\"" + e; }
+					if (sal != "0") { o += "\n\t\t\t\t<param name=\"salign\" value=\"" + sal + "\"" + e; }
+					if (wmd != "0") { o += "\n\t\t\t\t<param name=\"wmode\" value=\"" + wmd + "\"" + e; }
+					if (bgc != "") { o += "\n\t\t\t\t<param name=\"bgcolor\" value=\"" + bgc + "\"" + e; }
+					if (dfn != "0") { o += "\n\t\t\t\t<param name=\"devicefont\" value=\"" + dfn + "\"" + e; }
+					if (stb != "0") { o += "\n\t\t\t\t<param name=\"seamlesstabbing\" value=\"" + stb + "\"" + e; }
+					if (slc != "0") { o += "\n\t\t\t\t<param name=\"swliveconnect\" value=\"" + slc + "\"" + e; }
+					if (afs != "0") { o += "\n\t\t\t\t<param name=\"allowfullscreen\" value=\"" + afs + "\"" + e; }
+					if (asa != "0") { o += "\n\t\t\t\t<param name=\"allowscriptaccess\" value=\"" + asa + "\"" + e; }
+					if (anw != "0") { o += "\n\t\t\t\t<param name=\"allownetworking\" value=\"" + anw + "\"" + e; }
+					if (bas != "") { o += "\n\t\t\t\t<param name=\"base\" value=\"" + bas + "\"" + e; }
+					var fvrs = "";
+					for (var i = 1; i < flashvarsTotal + 1; i++) {
+						var fvName = document.getElementById("flashvarsName" + i).value;
+						var fvValue = document.getElementById("flashvarsValue" + i).value;
+						if (fvName != "" && fvValue != "") {
+							if (fvrs != "") { fvrs += "&amp;" };
+							fvrs += fvName + "=" + fvValue;
+						}
+					}
+					if (fvrs != "") { o += "\n\t\t\t\t<param name=\"flashvars\" value=\"" + fvrs + "\"" + e; }
+					o += "\n\t\t\t\t<!--[if !IE]>-->";
+					var atts2 = "";
+					if (cls != "") { atts2 += " class=\"" + cls + "\""; }
+					if (ali != "0") { atts2 += " align=\"" + ali + "\""; }
+					o += "\n\t\t\t\t<object type=\"application/x-shockwave-flash\" data=\"" + swf + "\" width=\"" + w + "\" height=\"" + h + "\"" + atts2 + ">";
+					if (pl != "0") { o += "\n\t\t\t\t\t<param name=\"play\" value=\"" + pl + "\"" + e; }
+					if (lp != "0") { o += "\n\t\t\t\t\t<param name=\"loop\" value=\"" + lp + "\"" + e; }
+					if (men != "0") { o += "\n\t\t\t\t\t<param name=\"menu\" value=\"" + men + "\"" + e; }
+					if (qua != "0") { o += "\n\t\t\t\t\t<param name=\"quality\" value=\"" + qua + "\"" + e; }
+					if (sca != "0") { o += "\n\t\t\t\t\t<param name=\"scale\" value=\"" + sca + "\"" + e; }
+					if (sal != "0") { o += "\n\t\t\t\t\t<param name=\"salign\" value=\"" + sal + "\"" + e; }
+					if (wmd != "0") { o += "\n\t\t\t\t\t<param name=\"wmode\" value=\"" + wmd + "\"" + e; }
+					if (bgc != "") { o += "\n\t\t\t\t\t<param name=\"bgcolor\" value=\"" + bgc + "\"" + e; }
+					if (dfn != "0") { o += "\n\t\t\t\t\t<param name=\"devicefont\" value=\"" + dfn + "\"" + e; }
+					if (stb != "0") { o += "\n\t\t\t\t\t<param name=\"seamlesstabbing\" value=\"" + stb + "\"" + e; }
+					if (slc != "0") { o += "\n\t\t\t\t\t<param name=\"swliveconnect\" value=\"" + slc + "\"" + e; }
+					if (afs != "0") { o += "\n\t\t\t\t\t<param name=\"allowfullscreen\" value=\"" + afs + "\"" + e; }
+					if (asa != "0") { o += "\n\t\t\t\t\t<param name=\"allowscriptaccess\" value=\"" + asa + "\"" + e; }
+					if (anw != "0") { o += "\n\t\t\t\t\t<param name=\"allownetworking\" value=\"" + anw + "\"" + e; }
+					if (bas != "") { o += "\n\t\t\t\t\t<param name=\"base\" value=\"" + bas + "\"" + e; }
+					if (fvrs != "") { o += "\n\t\t\t\t\t<param name=\"flashvars\" value=\"" + fvrs + "\"" + e; }
+					o += "\n\t\t\t\t<!--<![endif]-->";
+					o += "\n\t\t\t\t\t" + ac.replace(/\n/g, "\n\t\t\t\t\t");
+					o += "\n\t\t\t\t<!--[if !IE]>-->";
+    				o += "\n\t\t\t\t</object>";
+    				o += "\n\t\t\t\t<!--<![endif]-->";
+					o += "\n\t\t\t</object>";
+					o += "\n\t\t</div>";
+				}
+				o += "\n\t</body>";
+				o += "\n</html>";
+				document.getElementById("output").value = o;
+			}
+			
+			function clearOutput() {
+				document.getElementById("output").value = "";
+			}
+			
+			function checkRequired() {
+				var pm = document.getElementById("publishingMethod").selectedIndex; // 1 = dynamic, 0 = static
+				var a1 = document.getElementById("isIdReq");
+				var a2 = document.getElementById("toggleReplaceId");
+				var attId = document.getElementById("attId");
+				var replaceId = document.getElementById("replaceId");
+				if (pm) {
+					if (replaceId.value == "") { replaceId.value = "myAlternativeContent"; }
+					if (attId.value == "myFlashContent") { attId.value = ""; }
+					if (a1.style.display != "none") { a1.style.display = "none"; }
+					if (a2.style.display != "block") { a2.style.display = "block"; }
+				}
+				else {
+					if (attId.value == "") { attId.value = "myFlashContent"; }
+					if (replaceId.value == "myAlternativeContent") { replaceId.value = ""; }
+					if (a1.style.display != "inline") { a1.style.display = "inline"; }
+					if (a2.style.display != "none") { a2.style.display = "none"; }
+				}
+			}
+			
+			function checkAltContent() {
+				var doct = document.getElementById("htmlTemplate").value;
+				var acn = "<a href=\"http://www.adobe.com/go/getflashplayer\">\n\t<img src=\"http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif\" alt=\"Get Adobe Flash player\"";
+				if (doct == "html4transitional" || doct == "html4strict") {
+					acn += ">\n</a>";
+				}
+				else {
+					acn += " />\n</a>";
+				}
+				var ac = document.getElementById("alternativeContent").value;
+				if (ac == "" ||
+					ac == "<a href=\"http://www.adobe.com/go/getflashplayer\">\n\t<img src=\"http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif\" alt=\"Get Adobe Flash player\">\n</a>" ||
+					ac == "<a href=\"http://www.adobe.com/go/getflashplayer\">\n\t<img src=\"http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif\" alt=\"Get Adobe Flash player\" />\n</a>") { 
+					document.getElementById("alternativeContent").value = acn;
+				}
+			}
+			
+			function toggleSection(toggle, toggleable) {
+				if (toggleable.style.display == "" || toggleable.style.display == "inline") {
+					toggleable.style.display = "none";
+					toggle.firstChild.nodeValue = "+";
+				}
+				else {
+					toggleable.style.display = "inline";
+					toggle.firstChild.nodeValue = "-";
+				}
+			}
+			
+			function toggleAttsParamsCont() {
+				var tb = document.getElementById("toggleAttsParams");
+				var tc = document.getElementById("toggleAttsParamsContainer");
+				if (tc.style.display == "" || tc.style.display == "none") {
+					tc.style.display = "block";
+					tb.firstChild.nodeValue = "less";
+				}
+				else {
+					tc.style.display = "none";
+					tb.firstChild.nodeValue = "more";
+				}
+			}
+			
+			function addFlashvar() {
+				var t = flashvarsTotal;
+				var h = "\n<div class=\"col1 clear\">&nbsp;</div>";
+				h += "\n<div class=\"col3\"><label for=\"flashvarsName" + t + "\">name:</label></div>";
+				h += "\n<div class=\"col4\"><input type=\"text\" id=\"flashvarsName" + t + "\" name=\"flashvarsName" + t + "\" value=\"\" size=\"15\" /></div>";
+				h += "\n<div class=\"col3\"><label for=\"flashvarsValue" + t + "\">value:</label></div>";
+				h += "\n<div class=\"col4\"><input type=\"text\" id=\"flashvarsValue" + t + "\" name=\"flashvarsValue" + t + "\" value=\"\" size=\"15\" /></div>";
+				var m = document.getElementById("addFlashvarMarker");
+				var d = document.createElement("div");
+				d.innerHTML = h;
+				m.parentNode.insertBefore(d, m);
+			}
+			
+			window.onload = function() {
+				checkRequired();
+				document.getElementById("publishingMethod").onchange = function() {
+					checkRequired();
+				};
+				checkAltContent();
+				document.getElementById("htmlTemplate").onchange = function() {
+					checkAltContent();
+				};
+				document.getElementById("togglePublishingMethodHelp").onclick = function() {
+					var el = document.getElementById("publishingMethodHelp");
+					el.style.display = el.style.display == "block" ? "none" : "block";
+					return false;
+				};
+				document.getElementById("toggleAlternativeContentHelp").onclick = function() {
+					var el = document.getElementById("alternativeContentHelp");
+					el.style.display = el.style.display == "block" ? "none" : "block";
+					return false;
+				};
+				document.getElementById("toggleReplaceIdHelp").onclick = function() {
+					var el = document.getElementById("replaceIdHelp");
+					el.style.display = el.style.display == "block" ? "none" : "block";
+					return false;
+				};
+				document.getElementById("toggle1").onclick = function() {
+					toggleSection(this, document.getElementById("toggleable1"));
+					return false;
+				};
+				document.getElementById("toggle2").onclick = function() {
+					toggleSection(this, document.getElementById("toggleable2"));
+					return false;
+				};
+				document.getElementById("toggle3").onclick = function() {
+					toggleSection(this, document.getElementById("toggleable3"));
+					return false;
+				};
+				document.getElementById("toggle4").onclick = function() {
+					toggleSection(this, document.getElementById("toggleable4"));
+					return false;
+				};
+				document.getElementById("toggleAttsParams").onclick = function() {
+					toggleAttsParamsCont();
+					return false;
+				};
+				document.getElementById("addFlashvar").onclick = function() {
+					flashvarsTotal++;
+					addFlashvar();
+					return false;
+				};
+				document.getElementById("generate").onclick = function() {
+					generateOutput();
+				};
+				document.getElementById("clear").onclick = function() {
+					clearOutput();
+				};
+			};
+		//]]>
+		</script>
+	</head>
+	<body>
+		<h1>SWFObject 2.0 HTML and JavaScript generator v1.0</h1>
+		<div class="note">Asterisk (<span class="req">*</span>) indicates required field</div>
+		<fieldset>
+			<legend>SWFObject 2.0 configuration [ <a id="toggle1" href="#">-</a> ]</legend>
+			<div id="toggleable1">
+				<div class="col1">
+					<label for="swfobject" title="The relative or absolute path to your swfobject.js file" class="info">SWFObject (.js):</label> <span class="req">*</span>
+				</div>
+				<div class="col2">
+					<input type="text" id="swfobject" name="swfobject" value="swfobject.js" size="20" />
+				</div>
+				<div class="clear">&nbsp;</div>
+				<div class="col1">
+					<label for="publishingMethod">Publishing method:</label> <span class="req">*</span>
+				</div>
+				<div class="col2">
+					<select id="publishingMethod" name="publishingMethod">
+		  				<option value="static">Static publishing</option>
+						<option value="dynamic">Dynamic publishing</option>
+					</select>
+					<a id="togglePublishingMethodHelp" href="#">what is this?</a>
+				</div>
+				<div class="clear">&nbsp;</div>
+				<div id="publishingMethodHelp" class="help">
+					<h2>Static publishing</h2>
+					<h3>Description</h3>
+					<p>Embed Flash content and alternative content using standards compliant markup, and use unobtrusive JavaScript to resolve the issues that markup alone cannot solve.</p>
+					<h3>Pros</h3>
+					<p>The embedding of Flash content does not rely on JavaScript and the actual authoring of standards compliant markup is promoted.</p>
+					<h3>Cons</h3>
+					<p>Does not solve 'click-to-activate' mechanisms in Internet Explorer 6+ and Opera 9+ and is harder to author (without using this generator).</p>
+					<h2>Dynamic publishing</h2>
+					<h3>Description</h3>
+					<p>Create alternative content using standards compliant markup and embed Flash content with unobtrusive JavaScript.</p>
+					<h3>Pros</h3>
+					<p>Avoids 'click-to-activate' mechanisms in Internet Explorer 6+ and Opera 9+ and is easy to author (even without using this generator).</p>
+					<h3>Cons</h3>
+					<p>The embedding of Flash content relies on JavaScript, so if you have the Flash plug-in installed, but have JavaScript disabled or use a browser that doesn't support JavaScript, you will not be able to see your Flash content, however you will see alternative content instead. Flash content will also not be shown on a device like Sony PSP, which has very poor JavaScript support, and automated tools like RSS readers are not able to pick up Flash content.</p>
+				</div>
+				<div class="col1">
+					<label title="Flash version consists of major, minor and release version" class="info">Detect Flash version:</label> <span class="req">*</span>
+				</div>
+				<div class="col2">
+					<input type="text" id="major" name="major" value="9" size="4" maxlength="2" />
+					.
+					<input type="text" id="minor" name="minor" value="0" size="4" maxlength="4" />
+					.
+					<input type="text" id="release" name="release" value="0" size="4" maxlength="4" />
+				</div>
+				<div class="clear">&nbsp;</div>
+				<div class="col1">
+					<label for="expressInstall" title="The relative or absolute path to your expressInstall.swf file, check checkbox to activate" class="info">Adobe Express Install:</label>
+				</div>
+				<div class="col2">
+					<input type="checkbox" id="expressInstall" name="expressInstall" value="1" />
+					<input type="text" id="expressInstallSwf" name="expressInstallSwf" value="expressInstall.swf" size="20" />
+				</div>
+				<div class="clear">&nbsp;</div>
+				<div id="toggleReplaceId">
+					<div class="col1">
+						<label for="replaceId">HTML container id:</label> <span class="req">*</span>
+					</div>
+					<div class="col2">
+						<input type="text" id="replaceId" name="replaceId" value="" size="20" />
+						<a id="toggleReplaceIdHelp" href="#">what is this?</a>
+					</div>
+					<div id="replaceIdHelp" class="help">
+						<p>Specifies the id attribute of the HTML container element that will be replaced with Flash content if enough JavaScript and Flash support is available.</p>
+						<p>This HTML container will be generated automatically and will embed your alternative HTML content as defined in the HTML section.</p>
+					</div>
+					<div class="clear">&nbsp;</div>
+				</div>
+			</div>
+		</fieldset>
+		<fieldset>
+			<legend>SWF definition [ <a id="toggle2" href="#">-</a> ]</legend>
+			<div id="toggleable2">
+				<div class="col1">
+					<label for="swf" title="The relative or absolute path to your Flash content .swf file" class="info">Flash (.swf):</label> <span class="req">*</span>
+				</div>
+				<div class="col2">
+					<input type="text" id="swf" name="swf" value="untitled.swf" size="20" />
+				</div>
+				<div class="clear">&nbsp;</div>
+				<div class="col1">
+					<label title="Width x height (unit)" class="info">Dimensions:</label> <span class="req">*</span>
+				</div>
+				<div class="col2">
+					<input type="text" id="width" name="width" value="800" size="6" maxlength="6" />
+					x
+					<input type="text" id="height" name="height" value="600" size="6" maxlength="6" />
+					<select id="unit" name="unit">
+		  				<option value="pixels">pixels</option>
+						<option value="percentage">percentage</option>
+					</select>
+				</div>
+				<div class="clear">&nbsp;</div>
+				<div class="col1">	
+					<label for="attId" class="info" title="Uniquely identifies the Flash movie so that it can be referenced using a scripting language or by CSS">Flash content id</label> <span id="isIdReq" class="req">*</span>
+				</div>
+				<div class="col2">
+					<input type="text" id="attId" name="attId" value="" size="15" />
+				</div>
+				<div class="clear">&nbsp;</div>
+				<div id="toggleAttsParamsContainer">			
+					<div class="col1"><label class="info" title="HTML object element attributes">Attributes:</label></div>
+					<div class="col3">
+						<label for="attName" class="info" title="Uniquely names the Flash movie so that it can be referenced using a scripting language">name</label>
+					</div>
+					<div class="col4">
+						<input type="text" id="attName" name="attName" value="" size="15" />
+					</div>
+					<div class="clear">&nbsp;</div>
+					<div class="col1">&nbsp;</div>
+					<div class="col3">
+						<label for="attClass" class="info" title="Classifies the Flash movie so that it can be referenced using a scripting language or by CSS">class</label>
+					</div>
+					<div class="col4">
+						<input type="text" id="attClass" name="attClass" value="" size="15" />
+					</div>
+					<div class="clear">&nbsp;</div>
+					<div class="col1">&nbsp;</div>
+					<div class="col3">
+						<label for="align" class="info" title="HTML alignment of the object element. If this attribute is omitted, it by default centers the movie and crops edges if the browser window is smaller than the movie.">align</label>
+					</div>
+					<div class="col4">
+						<select id="align" name="align">
+							<option value="0">Choose...</option>
+							<option value="middle">middle</option>
+			  				<option value="left">left</option> 
+							<option value="right">right</option>
+							<option value="top">top</option>
+							<option value="bottom">bottom</option>
+						</select>
+					</div>
+					<div class="clear">&nbsp;</div>
+					<div class="col1">
+						<label class="info" title="HTML object element nested param elements">Parameters:</label>
+					</div>
+					<div class="col3">
+						<label for="play" class="info" title="Specifies whether the movie begins playing immediately on loading in the browser. The default value is true if this attribute is omitted.">play</label>
+					</div>
+					<div class="col4">
+						<select id="play" name="play">
+							<option value="0">Choose...</option>
+							<option value="true">true</option>
+			  				<option value="false">false</option>
+						</select>
+					</div>
+					<div class="col3">
+						<label for="loop" class="info" title="Specifies whether the movie repeats indefinitely or stops when it reaches the last frame. The default value is true if this attribute is omitted.">loop</label>
+					</div>
+					<div class="col4">
+						<select id="loop" name="loop">
+							<option value="0">Choose...</option>
+							<option value="true">true</option>
+			  				<option value="false">false</option>
+						</select>
+					</div>
+					<div class="clear">&nbsp;</div>
+					<div class="col1">&nbsp;</div>
+					<div class="col3">
+						<label for="menu" class="info" title="Shows a shortcut menu when users right-click (Windows) or control-click (Macintosh) the SWF file. To show only About Flash in the shortcut menu, deselect this option. By default, this option is set to true.">menu</label>
+					</div>
+					<div class="col4">
+						<select id="menu" name="menu">
+							<option value="0">Choose...</option>
+							<option value="true">true</option>
+			  				<option value="false">false</option>
+						</select>
+					</div>
+					<div class="col3">
+						<label for="quality" class="info" title="Specifies the trade-off between processing time and appearance. The default value is 'high' if this attribute is omitted.">quality</label>
+					</div>
+					<div class="col4">
+						<select id="quality" name="quality">
+							<option value="0">Choose...</option>
+							<option value="best">best</option>
+			  				<option value="high">high</option>
+							<option value="medium">medium</option>
+							<option value="autohigh">autohigh</option>
+							<option value="autolow">autolow</option>
+							<option value="low">low</option>
+						</select>
+					</div>
+					<div class="clear">&nbsp;</div>
+					<div class="col1">&nbsp;</div>
+					<div class="col3">
+						<label for="scale" class="info" title="Specifies scaling, aspect ratio, borders, distortion and cropping for if you have changed the document's original width and height.">scale</label>
+					</div>
+					<div class="col4">
+						<select id="scale" name="scale">
+							<option value="0">Choose...</option>
+							<option value="showall">showall</option>
+				  			<option value="noborder">noborder</option>
+							<option value="exactfit">exactfit</option>
+				  			<option value="noscale">noscale</option>
+						</select>
+					</div>
+					<div class="col3">
+						<label for="salign" class="info" title="Specifies where the content is placed within the application window and how it is cropped.">salign</label>
+					</div>
+					<div class="col4">
+						<select id="salign" name="salign">
+							<option value="0">Choose...</option>
+							<option value="tl">tl</option>
+				  			<option value="tr">tr</option>
+							<option value="bl">bl</option>
+				  			<option value="br">br</option>
+							<option value="l">l</option>
+				  			<option value="t">t</option>
+							<option value="r">r</option>
+				  			<option value="b">b</option>
+						</select>
+					</div>
+					<div class="clear">&nbsp;</div>
+					<div class="col1">&nbsp;</div>
+					<div class="col3">
+						<label for="wmode" class="info" title="Sets the Window Mode property of the Flash movie for transparency, layering, and positioning in the browser. The default value is 'window' if this attribute is omitted.">wmode</label>
+					</div>
+					<div class="col4">
+						<select id="wmode" name="wmode">
+							<option value="0">Choose...</option>
+							<option value="window">window</option>
+				  			<option value="opaque">opaque</option>
+							<option value="transparent">transparent</option>
+						</select>
+					</div>
+					<div class="col3">
+						<label for="bgcolor" class="info" title="Hexadecimal RGB value in the format #RRGGBB, which specifies the background color of the movie, which will override the background color setting specified in the Flash file.">bgcolor</label>
+					</div>
+					<div class="col4">
+						<input type="text" id="bgcolor" name="bgcolor" value="" size="15" maxlength="7" />
+					</div>
+					<div class="clear">&nbsp;</div>
+					<div class="col1">&nbsp;</div>
+					<div class="col3">
+						<label for="devicefont" class="info" title="Specifies whether static text objects that the Device Font option has not been selected for will be drawn using device fonts anyway, if the necessary fonts are available from the operating system.">devicefont</label>
+					</div>
+					<div class="col4">
+						<select id="devicefont" name="devicefont">
+							<option value="0">Choose...</option>
+							<option value="true">true</option>
+			  				<option value="false">false</option>
+						</select>
+					</div>
+					<div class="col3">
+						<label for="seamlesstabbing" class="info" title="Specifies whether users are allowed to use the Tab key to move keyboard focus out of a Flash movie and into the surrounding HTML (or the browser, if there is nothing focusable in the HTML following the Flash movie). The default value is true if this attribute is omitted.">seamlesstabbing</label>
+					</div>
+					<div class="col4">
+						<select id="seamlesstabbing" name="seamlesstabbing">
+							<option value="0">Choose...</option>
+							<option value="true">true</option>
+			  				<option value="false">false</option>
+						</select>
+					</div>
+					<div class="clear">&nbsp;</div>
+					<div class="col1">&nbsp;</div>
+					<div class="col3">
+						<label for="swliveconnect" class="info" title="Specifies whether the browser should start Java when loading the Flash Player for the first time. The default value is false if this attribute is omitted. If you use JavaScript and Flash on the same page, Java must be running for the FSCommand to work.">swliveconnect</label>
+					</div>
+					<div class="col4">
+						<select id="swliveconnect" name="swliveconnect">
+							<option value="0">Choose...</option>
+							<option value="true">true</option>
+			  				<option value="false">false</option>
+						</select>
+					</div>
+					<div class="col3">
+						<label for="allowfullscreen" class="info" title="Enables full-screen mode. The default value is false if this attribute is omitted. You must have version 9,0,28,0 or greater of Flash Player installed to use full-screen mode.">allowfullscreen</label>
+					</div>
+					<div class="col4">
+						<select id="allowfullscreen" name="allowfullscreen">
+							<option value="0">Choose...</option>
+							<option value="true">true</option>
+			  				<option value="false">false</option>
+						</select>
+					</div>
+					<div class="clear">&nbsp;</div>
+					<div class="col1">&nbsp;</div>
+					<div class="col3">
+						<label for="allowscriptaccess" class="info" title="Controls the ability to perform outbound scripting from within a Flash SWF. The default value is 'always' if this attribute is omitted.">allowscriptaccess</label>
+					</div>
+					<div class="col4">
+						<select id="allowscriptaccess" name="allowscriptaccess">
+							<option value="0">Choose...</option>
+							<option value="always">always</option>
+			  				<option value="never">never</option>
+						</select>
+					</div>
+					<div class="col3">
+						<label for="allownetworking" class="info" title="Controls a SWF file's access to network functionality. The default value is 'all' if this attribute is omitted.">allownetworking</label>
+					</div>
+					<div class="col4">
+						<select id="allownetworking" name="allownetworking">
+							<option value="0">Choose...</option>
+							<option value="all">all</option>
+			  				<option value="internal">internal</option>
+							<option value="none">none</option>
+						</select>
+					</div>
+					<div class="clear">&nbsp;</div>
+					<div class="col1">&nbsp;</div>
+					<div class="col3">
+						<label for="base" class="info" title="Specifies the base directory or URL used to resolve all relative path statements in the Flash Player movie. This attribute is helpful when your Flash Player movies are kept in a different directory from your other files.">base</label>
+					</div>
+					<div class="col4">
+						<input type="text" id="base" name="base" value="" size="15" />
+					</div>
+					<div class="clear">&nbsp;</div>
+					<div class="col1">
+						<label class="info" title="Method to pass variables to a Flash movie.">Flashvars:</label> <a id="addFlashvar" href="#">add</a>
+					</div>
+					<div class="col3">
+						<label for="flashvarsName1">name:</label>
+					</div>
+					<div class="col4">
+						<input type="text" id="flashvarsName1" name="flashvarsName1" value="" size="15" />
+					</div>
+					<div class="col3">
+						<label for="flashvarsValue1">value:</label>
+					</div>
+					<div class="col4">
+						<input type="text" id="flashvarsValue1" name="flashvarsValue1" value="" size="15" />
+					</div>
+					<div id="addFlashvarMarker"></div>
+				</div>				
+				<div class="clear">&nbsp;</div>
+				<div class="col1"><a id="toggleAttsParams" href="#">more</a></div>
+				<div class="clear">&nbsp;</div>
+			</div>
+		</fieldset>
+		<fieldset>
+			<legend>HTML definition [ <a id="toggle3" href="#">-</a> ]</legend>
+			<div id="toggleable3">
+				<div class="col1">
+					<label for="htmlTemplate">HTML Template:</label>
+				</div>
+				<div class="col2">
+					<select id="htmlTemplate" name="htmlTemplate">
+		  				<option value="xhtml1strict">XHTML 1.0 Strict</option>
+						<option value="xhtml1transitional">XHTML 1.0 Transitional</option>
+						<option value="html4strict">HTML 4.01 Strict</option>
+						<option value="html4transitional">HTML 4.01 Transitional</option>
+					</select>
+				</div>
+				<div class="clear">&nbsp;</div>
+				<div class="col1">
+					<label for="charEncoding">Character encoding:</label>
+				</div>
+				<div class="col2">
+					<select id="charEncoding" name="charEncoding">
+		  				<option value="iso-8859-1">iso-8859-1</option>
+						<option value="utf-8">utf-8</option>
+					</select>
+				</div>
+				<div class="clear">&nbsp;</div>
+				<div class="col1">
+					<label for="alternativeContent">Alternative content:</label>
+				</div>
+				<div class="col2">
+					<a id="toggleAlternativeContentHelp" href="#alternativeContentHelp">what is this?</a>
+				</div>
+				<div id="alternativeContentHelp" class="help">
+					<p>The object element allows you to nest alternative content inside of it, which will be displayed if Flash is not installed or supported. 
+					This content will also be picked up by search engines, making it a great tool for creating search-engine-friendly content.</p>
+					<p>Summarized, you should use alternative content for the following:</p>
+					<ul>
+						<li>When you like to create content that is accessible for people who browse the Web without plugins</li>
+						<li>When you like to create search-engine-friendly content</li>
+						<li>To tell visitors that they can have a richer user experience by downloading the Flash plugin</li>
+					</ul>
+				</div>
+				<div class="clear">&nbsp;</div>
+				<div class="col2">
+					<textarea id="alternativeContent" name="alternativeContent" rows="6" cols="10"></textarea>
+				</div>
+				<div class="clear">&nbsp;</div>
+			</div>
+		</fieldset>
+		<div class="col1">
+			<input type="button" class="button" id="generate" name="generate" value="Generate" />
+			<input type="button" class="button" id="clear" name="clear" value="Clear" />
+		</div>
+		<div class="clear">&nbsp;</div>
+		<fieldset>
+			<legend>Generated output [ <a id="toggle4" href="#">-</a> ]</legend>
+			<div id="toggleable4">
+				<div class="col2">
+					<textarea id="output" name="output" rows="32" cols="10"></textarea>
+				</div>
+				<div class="clear">&nbsp;</div>
+			</div>
+		</fieldset>
+	</body>
+</html>
