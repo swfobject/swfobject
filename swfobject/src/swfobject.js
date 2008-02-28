@@ -93,7 +93,7 @@ var swfobject = function() {
 		@*/
 		return { w3cdom:w3cdom, pv:playerVersion, webkit:webkit, ie:ie, win:windows, mac:mac };
 	}();
-		
+
 	/* Cross-browser onDomLoad
 		- Based on Dean Edwards' solution: http://dean.edwards.name/weblog/2006/06/again/
 		- Will fire an event as soon as the DOM of a page is loaded (supported by Gecko based browsers - like Firefox -, IE, Opera9+, Safari)
