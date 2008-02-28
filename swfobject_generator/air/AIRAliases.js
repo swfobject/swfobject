@@ -1,4 +1,4 @@
-/* AIRAliases.js - Revision: 0.17 */
+/* AIRAliases.js - Revision: 1.0 */
 
 // Copyright 2007-2008 Adobe Systems Incorporated.
 // All rights reserved.
@@ -61,9 +61,7 @@ if (window.runtime)
     air.SecurityErrorEvent = window.runtime.flash.events.SecurityErrorEvent;
     air.StatusEvent = window.runtime.flash.events.StatusEvent;
     air.TimerEvent = window.runtime.flash.events.TimerEvent;
-    air.NativeDragEvent = window.runtime.flash.events.NativeDragEvent;
     air.ActivityEvent = window.runtime.flash.events.ActivityEvent;
-    air.KeyboardEvent = window.runtime.flash.events.KeyboardEvent;    
     
     // native window
     air.NativeWindow = window.runtime.flash.display.NativeWindow;
