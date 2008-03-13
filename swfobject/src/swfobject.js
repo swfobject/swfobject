@@ -1,4 +1,4 @@
-/*!	SWFObject v2.0 rc4 <http://code.google.com/p/swfobject/>
+/*!	SWFObject v2.0 <http://code.google.com/p/swfobject/>
 	Copyright (c) 2007 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
@@ -256,12 +256,14 @@ var swfobject = function() {
 		if (ua.ie && ua.win && hasPlayerVersion("8.0.0")) {
 			win.attachEvent("onunload", function () {
 				var obj = getElementById(id);
-				for (var i in obj) {
-					if (typeof obj[i] == "function") {
-						obj[i] = function() {};
+				if (obj) {
+					for (var i in obj) {
+						if (typeof obj[i] == "function") {
+							obj[i] = function() {};
+						}
 					}
+					obj.parentNode.removeChild(obj);
 				}
-				obj.parentNode.removeChild(obj);
 			});
 		}
 	}
