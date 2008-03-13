@@ -7,7 +7,6 @@ var swfobject = function() {
 	
 	var UNDEF = "undefined",
 		OBJECT = "object",
-		CSS_VISIBLE = "visibility:visible",
 		CSS_HIDDEN = "visibility:hidden",
 		SHOCKWAVE_FLASH = "Shockwave Flash",
 		SHOCKWAVE_FLASH_AX = "ShockwaveFlash.ShockwaveFlash",
@@ -194,7 +193,7 @@ var swfobject = function() {
 		var rl = regObjArr.length;
 		for (var i = 0; i < rl; i++) { // For each registered object element
 			var id = regObjArr[i].id;
-			if (ua.pv[0] > 0) { // If no fp is installed, we let the object element do its job (show alternative content)
+			if (ua.pv[0] > 0) {
 				var obj = getElementById(id);
 				if (obj) {
 					regObjArr[i].width = obj.getAttribute("width") ? obj.getAttribute("width") : "0";
@@ -203,6 +202,7 @@ var swfobject = function() {
 						if (ua.webkit && ua.webkit < 312) { // Older webkit engines ignore the object element's nested param elements
 							fixParams(obj);
 						}
+						getElementById(id).style.visibility = "visible";
 					}
 					else if (regObjArr[i].expressInstall && !isExpressInstallActive && hasPlayerVersion("6.0.65") && (ua.win || ua.mac)) { // Show the Adobe Express Install dialog if set by the web page author and if supported (fp6.0.65+ on Win/Mac OS only)
 						showExpressInstall(regObjArr[i]);
@@ -212,7 +212,9 @@ var swfobject = function() {
 					}
 				}
 			}
-			createCSS("#" + id, CSS_VISIBLE);
+			else {  // If no fp is installed, we let the object element do its job (show alternative content)
+				getElementById(id).style.visibility = "visible";
+			}
 		}
 	}
 	
@@ -535,7 +537,9 @@ var swfobject = function() {
 				}
 				addDomLoadEvent(function() {
 					createSWF(att, par, replaceElemIdStr);
-					createCSS("#" + replaceElemIdStr, CSS_VISIBLE);
+					if (att.id == replaceElemIdStr) {
+						getElementById(replaceElemIdStr).style.visibility = "visible";
+					}
 				});
 			}
 			else if (xiSwfUrlStr && !isExpressInstallActive && hasPlayerVersion("6.0.65") && (ua.win || ua.mac)) {
@@ -547,7 +551,7 @@ var swfobject = function() {
 					regObj.height = heightStr;
 					regObj.expressInstall = xiSwfUrlStr;
 					showExpressInstall(regObj);
-					createCSS("#" + replaceElemIdStr, CSS_VISIBLE);
+					createCSS("#" + replaceElemIdStr, "visibility:visible");
 				});
 			}
 		},
