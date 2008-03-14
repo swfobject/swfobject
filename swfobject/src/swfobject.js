@@ -615,6 +615,9 @@ var swfobject = function() {
 					obj.parentNode.replaceChild(storedAltContent, obj);
 					if (storedAltContentId) {
 						setVisibility(storedAltContentId, true);
+						if (ua.ie && ua.win) {
+							storedAltContent.style.display = "block";
+						}
 					}
 					storedAltContent = null;
 					storedAltContentId = null;
