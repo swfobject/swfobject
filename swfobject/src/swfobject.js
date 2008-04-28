@@ -1,4 +1,4 @@
-/*!	SWFObject v2.1 beta1 <http://code.google.com/p/swfobject/>
+/*!	SWFObject v2.1 beta2 <http://code.google.com/p/swfobject/>
 	Copyright (c) 2007 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
@@ -254,19 +254,43 @@ var swfobject = function() {
 		- Occurs when unloading a web page in IE using fp8+ and innerHTML/outerHTML
 		- Dynamic publishing only
 	*/
+	
 	function fixObjectLeaks(id) {
 		if (ua.ie && ua.win && hasPlayerVersion("8.0.0")) {
 			win.attachEvent("onunload", function () {
-				var obj = getElementById(id);
-				if (obj) {
-					for (var i in obj) {
-						if (typeof obj[i] == "function") {
-							obj[i] = function() {};
-						}
-					}
-					obj.parentNode.removeChild(obj);
-				}
+				 removeSWF(id);
 			});
+		}
+	}
+	
+	function removeSWF(id) {
+		var obj = getElementById(id);
+		if (obj) {
+			if (ua.ie && ua.win) {
+				if (obj.readyState == 4) {
+					removeObjectInIE(id);
+				}
+				else {
+					win.attachEvent("onload", function() {
+						removeObjectInIE(id);
+					});
+				}
+			}
+			else {
+				obj.parentNode.removeChild(obj);
+			}
+		}
+	}
+	
+	function removeObjectInIE(id) {
+		var obj = getElementById(id);
+		if (obj) {
+			for (var i in obj) {
+				if (typeof obj[i] == "function") {
+					obj[i] = function() {};
+				}
+			}
+			obj.parentNode.removeChild(obj);
 		}
 	}
 	
@@ -578,6 +602,12 @@ var swfobject = function() {
 			}
 			else {
 				return undefined;
+			}
+		},
+		
+		removeSWF: function(objElemIdStr) {
+			if (ua.w3cdom && isDomLoaded) {
+				removeSWF(objElemIdStr);
 			}
 		},
 		
