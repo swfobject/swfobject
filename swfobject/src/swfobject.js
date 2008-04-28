@@ -1,4 +1,4 @@
-/*!	SWFObject v2.0 <http://code.google.com/p/swfobject/>
+/*!	SWFObject v2.1 beta1 <http://code.google.com/p/swfobject/>
 	Copyright (c) 2007 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
@@ -30,12 +30,12 @@ var swfobject = function() {
 		- Is executed directly for optimal performance
 	*/	
 	var ua = function() {
-		var w3cdom = typeof doc.getElementById != UNDEF && typeof doc.getElementsByTagName != UNDEF && typeof doc.createElement != UNDEF && typeof doc.appendChild != UNDEF && typeof doc.replaceChild != UNDEF && typeof doc.removeChild != UNDEF && typeof doc.cloneNode != UNDEF,
+		var w3cdom = typeof doc.getElementById != UNDEF && typeof doc.getElementsByTagName != UNDEF && typeof doc.createElement != UNDEF,
 			playerVersion = [0,0,0],
 			d = null;
 		if (typeof nav.plugins != UNDEF && typeof nav.plugins[SHOCKWAVE_FLASH] == OBJECT) {
 			d = nav.plugins[SHOCKWAVE_FLASH].description;
-			if (d) {
+			if (d && !(typeof nav.mimeTypes != UNDEF && nav.mimeTypes[FLASH_MIME_TYPE] && !nav.mimeTypes[FLASH_MIME_TYPE].enabledPlugin)) { // navigator.mimeTypes["application/x-shockwave-flash"].enabledPlugin indicates whether plug-ins are enabled or disabled in Safari 3+
 				d = d.replace(/^.*\s+(\S+\s+\S+$)/, "$1");
 				playerVersion[0] = parseInt(d.replace(/^(.*)\..*$/, "$1"), 10);
 				playerVersion[1] = parseInt(d.replace(/^.*\.(.*)\s.*$/, "$1"), 10);
@@ -451,8 +451,8 @@ var swfobject = function() {
 	function hasPlayerVersion(rv) {
 		var pv = ua.pv, v = rv.split(".");
 		v[0] = parseInt(v[0], 10);
-		v[1] = parseInt(v[1], 10);
-		v[2] = parseInt(v[2], 10);
+		v[1] = parseInt(v[1], 10) || 0; // supports short notation, e.g. "9" instead of "9.0.0"
+		v[2] = parseInt(v[2], 10) || 0;
 		return (pv[0] > v[0] || (pv[0] == v[0] && pv[1] > v[1]) || (pv[0] == v[0] && pv[1] == v[1] && pv[2] >= v[2])) ? true : false;
 	}
 	
