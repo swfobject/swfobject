@@ -1,4 +1,4 @@
-/*!	SWFObject v2.1 beta2 <http://code.google.com/p/swfobject/>
+/*!	SWFObject v2.1 beta3 <http://code.google.com/p/swfobject/>
 	Copyright (c) 2007 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
@@ -18,6 +18,9 @@ var swfobject = function() {
 		
 		domLoadFnArr = [],
 		regObjArr = [],
+		objIdArr = [],
+		listenersArr = [],
+		script,
 		timer = null,
 		storedAltContent = null,
 		storedAltContentId = null,
@@ -105,14 +108,9 @@ var swfobject = function() {
 		if (ua.ie && ua.win) {
 			try {  // Avoid a possible Operation Aborted error
 				doc.write("<scr" + "ipt id=__ie_ondomload defer=true src=//:></scr" + "ipt>"); // String is split into pieces to avoid Norton AV to add code that can cause errors 
-				var s = getElementById("__ie_ondomload");
-				if (s) {
-					s.onreadystatechange = function() {
-						if (this.readyState == "complete") {
-							this.parentNode.removeChild(this);
-							callDomLoadFunctions();
-						}
-					};
+				script = getElementById("__ie_ondomload");
+				if (script) {
+					addListener(script, "onreadystatechange", checkReadyState);
 				}
 			}
 			catch(e) {}
@@ -125,6 +123,13 @@ var swfobject = function() {
 		}
 		addLoadEvent(callDomLoadFunctions);
 	}();
+	
+	function checkReadyState() {
+		if (script.readyState == "complete") {
+			script.parentNode.removeChild(script);
+			callDomLoadFunctions();
+		}
+	}
 	
 	function callDomLoadFunctions() {
 		if (isDomLoaded) {
@@ -172,7 +177,7 @@ var swfobject = function() {
 			doc.addEventListener("load", fn, false);
 		}
 		else if (typeof win.attachEvent != UNDEF) {
-			win.attachEvent("onload", fn);
+			addListener(win, "onload", fn);
 		}
 		else if (typeof win.onload == "function") {
 			var fnOld = win.onload;
@@ -250,50 +255,6 @@ var swfobject = function() {
 		}
 	}
 	
-	/* Fix hanging audio/video threads and force open sockets and NetConnections to disconnect
-		- Occurs when unloading a web page in IE using fp8+ and innerHTML/outerHTML
-		- Dynamic publishing only
-	*/
-	
-	function fixObjectLeaks(id) {
-		if (ua.ie && ua.win && hasPlayerVersion("8.0.0")) {
-			win.attachEvent("onunload", function () {
-				 removeSWF(id);
-			});
-		}
-	}
-	
-	function removeSWF(id) {
-		var obj = getElementById(id);
-		if (obj) {
-			if (ua.ie && ua.win) {
-				if (obj.readyState == 4) {
-					removeObjectInIE(id);
-				}
-				else {
-					win.attachEvent("onload", function() {
-						removeObjectInIE(id);
-					});
-				}
-			}
-			else {
-				obj.parentNode.removeChild(obj);
-			}
-		}
-	}
-	
-	function removeObjectInIE(id) {
-		var obj = getElementById(id);
-		if (obj) {
-			for (var i in obj) {
-				if (typeof obj[i] == "function") {
-					obj[i] = function() {};
-				}
-			}
-			obj.parentNode.removeChild(obj);
-		}
-	}
-	
 	/* Show the Adobe Express Install dialog
 		- Reference: http://www.adobe.com/cfusion/knowledgebase/index.cfm?id=6a253b75
 	*/
@@ -330,7 +291,10 @@ var swfobject = function() {
 				newObj.setAttribute("id", replaceId);
 				obj.parentNode.insertBefore(newObj, obj); // Insert placeholder div that will be replaced by the object element that loads expressinstall.swf
 				obj.style.display = "none";
-				win.attachEvent("onload", function() { obj.parentNode.removeChild(obj); });
+				var fn = function() {
+					obj.parentNode.removeChild(obj);
+				};
+				addListener(win, "onload", fn);
 			}
 			createSWF({ data:regObj.expressInstall, id:EXPRESS_INSTALL_ID, width:regObj.width, height:regObj.height }, { flashvars:fv }, replaceId);
 		}
@@ -346,7 +310,10 @@ var swfobject = function() {
 			obj.parentNode.insertBefore(el, obj); // Insert placeholder div that will be replaced by the alternative content
 			el.parentNode.replaceChild(abstractAltContent(obj), el);
 			obj.style.display = "none";
-			win.attachEvent("onload", function() { obj.parentNode.removeChild(obj); });
+			var fn = function() {
+				obj.parentNode.removeChild(obj);
+			};
+			addListener(win, "onload", fn);
 		}
 		else {
 			obj.parentNode.replaceChild(abstractAltContent(obj), obj);
@@ -404,7 +371,7 @@ var swfobject = function() {
 				}
 			}
 			el.outerHTML = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"' + att + '>' + par + '</object>';
-			fixObjectLeaks(attObj.id); // This bug affects dynamic publishing only
+			objIdArr[objIdArr.length] = attObj.id; // Stored to fix object 'leaks' on unload (dynamic publishing only)
 			r = getElementById(attObj.id);	
 		}
 		else if (ua.webkit && ua.webkit < 312) { // Older webkit engines ignore the object element's nested param elements: fall back to the proprietary embed element
@@ -464,12 +431,56 @@ var swfobject = function() {
 		el.appendChild(p);
 	}
 	
+	/* Cross-browser SWF removal
+		- Especially needed to safely and completely remove a SWF in Internet Explorer
+	*/
+	function removeSWF(id) {
+		var obj = getElementById(id);
+		if (obj) {
+			if (ua.ie && ua.win) {
+				if (obj.readyState == 4) {
+					removeObjectInIE(id);
+				}
+				else {
+					win.attachEvent("onload", function() {
+						removeObjectInIE(id);
+					});
+				}
+			}
+			else {
+				obj.parentNode.removeChild(obj);
+			}
+		}
+	}
+	
+	function removeObjectInIE(id) {
+		var obj = getElementById(id);
+		if (obj) {
+			for (var i in obj) {
+				if (typeof obj[i] == "function") {
+					obj[i] = null;
+				}
+			}
+			obj.parentNode.removeChild(obj);
+		}
+	}
+	
+	/* Functions to optimize JavaScript compression
+	*/
 	function getElementById(id) {
 		return doc.getElementById(id);
 	}
 	
 	function createElement(el) {
 		return doc.createElement(el);
+	}
+	
+	/* Updated attachEvent function for Internet Explorer
+		- Stores attachEvent information in an Array, so on unload the detachEvent functions can be called to avoid memory leaks
+	*/	
+	function addListener(target, eventType, fn) {
+		target.attachEvent(eventType, fn);
+		listenersArr[listenersArr.length] = [target, eventType, fn];
 	}
 	
 	function hasPlayerVersion(rv) {
@@ -511,6 +522,35 @@ var swfobject = function() {
 			createCSS("#" + id, "visibility:" + v);
 		}
 	}
+	
+	/* Release memory to avoid memory leaks caused by closures, fix hanging audio/video threads and force open sockets/NetConnections to disconnect (Internet Explorer only)
+	*/
+	var cleanup = function() {
+		if (ua.ie && ua.win) {
+			window.attachEvent("onunload", function() {
+				// remove listeners to avoid memory leaks
+				var ll = listenersArr.length;
+				for (var i = 0; i < ll; i++) {
+					listenersArr[i][0].detachEvent(listenersArr[i][1], listenersArr[i][2]);
+				}
+				// cleanup dynamically embedded objects to fix audio/video threads and force open sockets and NetConnections to disconnect
+				var il = objIdArr.length;
+				for (var j = 0; j < il; j++) {
+					removeSWF(objIdArr[j]);
+				}
+				// cleanup library's main closures to avoid memory leaks
+				for (var k in ua) {
+					ua[k] = null;
+				}
+				ua = null;
+				for (var l in swfobject) {
+					swfobject[l] = null;
+				}
+				swfobject = null;
+			});
+		}
+	}();
+	
 	
 	return {
 		/* Public API
@@ -578,6 +618,7 @@ var swfobject = function() {
 				});
 			}
 			else if (xiSwfUrlStr && !isExpressInstallActive && hasPlayerVersion("6.0.65") && (ua.win || ua.mac)) {
+				isExpressInstallActive = true; // deferred execution
 				setVisibility(replaceElemIdStr, false);
 				addDomLoadEvent(function() {
 					var regObj = {};
