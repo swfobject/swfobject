@@ -1,4 +1,4 @@
-/*!	SWFObject v2.1 beta4 <http://code.google.com/p/swfobject/>
+/*!	SWFObject v2.1 beta5 <http://code.google.com/p/swfobject/>
 	Copyright (c) 2007 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
@@ -234,7 +234,7 @@ var swfobject = function() {
 			if (a) {
 				var al = a.length;
 				for (var i = 0; i < al; i++) {
-					if (a[i].nodeName.toLowerCase() == "data") {
+					if (a[i].nodeName == "DATA") {
 						e.setAttribute("src", a[i].nodeValue);
 					}
 					else {
@@ -246,7 +246,7 @@ var swfobject = function() {
 			if (c) {
 				var cl = c.length;
 				for (var j = 0; j < cl; j++) {
-					if (c[j].nodeType == 1 && c[j].nodeName.toLowerCase() == "param") {
+					if (c[j].nodeType == 1 && c[j].nodeName == "PARAM") {
 						e.setAttribute(c[j].getAttribute("name"), c[j].getAttribute("value"));
 					}
 				}
@@ -332,7 +332,7 @@ var swfobject = function() {
 				if (c) {
 					var cl = c.length;
 					for (var i = 0; i < cl; i++) {
-						if (!(c[i].nodeType == 1 && c[i].nodeName.toLowerCase() == "param") && !(c[i].nodeType == 8)) {
+						if (!(c[i].nodeType == 1 && c[i].nodeName == "PARAM") && !(c[i].nodeType == 8)) {
 							ac.appendChild(c[i].cloneNode(true));
 						}
 					}
@@ -415,7 +415,7 @@ var swfobject = function() {
 					}
 				}
 				for (var n in parObj) {
-					if (parObj[n] != Object.prototype[n] && n != "movie") { // Filter out prototype additions from other potential libraries and IE specific param element
+					if (parObj[n] != Object.prototype[n] && n.toLowerCase() != "movie") { // Filter out prototype additions from other potential libraries and IE specific param element
 						createObjParam(o, n, parObj[n]);
 					}
 				}
@@ -438,7 +438,7 @@ var swfobject = function() {
 	*/
 	function removeSWF(id) {
 		var obj = getElementById(id);
-		if (obj) {
+		if (obj && (obj.nodeName == "OBJECT" || obj.nodeName == "EMBED")) {
 			if (ua.ie && ua.win) {
 				if (obj.readyState == 4) {
 					removeObjectInIE(id);
