@@ -1,4 +1,4 @@
-/*!	SWFObject v2.1 beta5 <http://code.google.com/p/swfobject/>
+/*!	SWFObject v2.1 beta6 <http://code.google.com/p/swfobject/>
 	Copyright (c) 2007 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
@@ -593,23 +593,37 @@ var swfobject = function() {
 			if (!ua.w3cdom || !swfUrlStr || !replaceElemIdStr || !widthStr || !heightStr || !swfVersionStr) {
 				return;
 			}
-			widthStr += ""; // Auto-convert to string to make it idiot proof
+			widthStr += ""; // Auto-convert to string
 			heightStr += "";
 			if (hasPlayerVersion(swfVersionStr)) {
 				setVisibility(replaceElemIdStr, false);
-				var att = (typeof attObj == OBJECT) ? attObj : {};
+				var att = {};
+				if (attObj && typeof attObj === OBJECT) {
+					for (var i in attObj) {
+						if (attObj[i] != Object.prototype[i]) { // Filter out prototype additions from other potential libraries
+							att[i] = attObj[i];
+						}
+					}
+				}
 				att.data = swfUrlStr;
 				att.width = widthStr;
 				att.height = heightStr;
-				var par = (typeof parObj == OBJECT) ? parObj : {};
-				if (typeof flashvarsObj == OBJECT) {
-					for (var i in flashvarsObj) {
-						if (flashvarsObj[i] != Object.prototype[i]) { // Filter out prototype additions from other potential libraries
+				var par = {}; 
+				if (parObj && typeof parObj === OBJECT) {
+					for (var j in parObj) {
+						if (parObj[j] != Object.prototype[j]) { // Filter out prototype additions from other potential libraries
+							par[j] = parObj[j];
+						}
+					}
+				}
+				if (flashvarsObj && typeof flashvarsObj === OBJECT) {
+					for (var k in flashvarsObj) {
+						if (flashvarsObj[k] != Object.prototype[k]) { // Filter out prototype additions from other potential libraries
 							if (typeof par.flashvars != UNDEF) {
-								par.flashvars += "&" + i + "=" + flashvarsObj[i];
+								par.flashvars += "&" + k + "=" + flashvarsObj[k];
 							}
 							else {
-								par.flashvars = i + "=" + flashvarsObj[i];
+								par.flashvars = k + "=" + flashvarsObj[k];
 							}
 						}
 					}
