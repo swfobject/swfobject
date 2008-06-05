@@ -1,4 +1,4 @@
-/*!	SWFObject v2.1 beta6 <http://code.google.com/p/swfobject/>
+/*! SWFObject v2.1 beta6 <http://code.google.com/p/swfobject/>
 	Copyright (c) 2007 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
@@ -54,7 +54,7 @@ var swfobject = function() {
 				try { 
 					a = new ActiveXObject(SHOCKWAVE_FLASH_AX + ".6");
 					playerVersion = [6,0,21];
-					a.AllowScriptAccess = "always";  // Introduced in fp6.0.47
+					a.AllowScriptAccess = "always";	 // Introduced in fp6.0.47
 				}
 				catch(e) {
 					if (playerVersion[0] == 6) {
@@ -70,7 +70,7 @@ var swfobject = function() {
 			}
 			if (!fp6Crash && a) { // a will return null when ActiveX is disabled
 				try {
-					d = a.GetVariable("$version");  // Will crash fp6.0.21/23/29
+					d = a.GetVariable("$version");	// Will crash fp6.0.21/23/29
 					if (d) {
 						d = d.split(" ")[1].split(",");
 						playerVersion = [parseInt(d[0], 10), parseInt(d[1], 10), parseInt(d[2], 10)];
@@ -106,7 +106,7 @@ var swfobject = function() {
 		}
 		addDomLoadEvent(main);
 		if (ua.ie && ua.win) {
-			try {  // Avoid a possible Operation Aborted error
+			try {	 // Avoid a possible Operation Aborted error
 				doc.write("<scr" + "ipt id=__ie_ondomload defer=true src=//:></scr" + "ipt>"); // String is split into pieces to avoid Norton AV to add code that can cause errors 
 				script = getElementById("__ie_ondomload");
 				if (script) {
@@ -217,7 +217,7 @@ var swfobject = function() {
 					}
 				}
 			}
-			else {  // If no fp is installed, we let the object element do its job (show alternative content)
+			else {	// If no fp is installed, we let the object element do its job (show alternative content)
 				setVisibility(id, true);
 			}
 		}
@@ -318,7 +318,7 @@ var swfobject = function() {
 		else {
 			obj.parentNode.replaceChild(abstractAltContent(obj), obj);
 		}
-	}	
+	} 
 
 	function abstractAltContent(obj) {
 		var ac = createElement("div");
@@ -527,11 +527,11 @@ var swfobject = function() {
 		}
 	}
 
-  function urlEncodeIfNecessary(str) {
-    var regex = /[\\\"<>\.;]/;
-    var hasBadChars = regex.exec(s) != null;
-    return hasBadChars ? encodeURIComponent(s) : s;
-  }
+	function urlEncodeIfNecessary(str) {
+		var regex = /[\\\"<>\.;]/;
+		var hasBadChars = regex.exec(s) != null;
+		return hasBadChars ? encodeURIComponent(s) : s;
+	}
 	
 	/* Release memory to avoid memory leaks caused by closures, fix hanging audio/video threads and force open sockets/NetConnections to disconnect (Internet Explorer only)
 	*/
@@ -585,7 +585,7 @@ var swfobject = function() {
 				if (o) {
 					var n = o.getElementsByTagName(OBJECT)[0];
 					if (!n || (n && typeof o.SetVariable != UNDEF)) {
-				    	r = o;
+							r = o;
 					}
 					else if (typeof n.SetVariable != UNDEF) {
 						r = n;
@@ -691,7 +691,7 @@ var swfobject = function() {
 			if (param == null) {
 				return urlEncodeIfNecessary(q);
 			}
-		 	if(q) {
+			if (q) {
 				var pairs = q.substring(1).split("&");
 				for (var i = 0; i < pairs.length; i++) {
 					if (pairs[i].substring(0, pairs[i].indexOf("=")) == param) {
@@ -720,7 +720,5 @@ var swfobject = function() {
 				}
 			} 
 		}
-		
 	};
-
 }();
