@@ -526,6 +526,12 @@ var swfobject = function() {
 			createCSS("#" + id, "visibility:" + v);
 		}
 	}
+
+  function urlEncodeIfNecessary(str) {
+    var regex = /[\\\"<>\.;]/;
+    var hasBadChars = regex.exec(s) != null;
+    return hasBadChars ? encodeURIComponent(s) : s;
+  }
 	
 	/* Release memory to avoid memory leaks caused by closures, fix hanging audio/video threads and force open sockets/NetConnections to disconnect (Internet Explorer only)
 	*/
@@ -653,7 +659,7 @@ var swfobject = function() {
 			return { major:ua.pv[0], minor:ua.pv[1], release:ua.pv[2] };
 		},
 		
-		hasFlashPlayerVersion:hasPlayerVersion,
+		hasFlashPlayerVersion: hasPlayerVersion,
 		
 		createSWF: function(attObj, parObj, replaceElemIdStr) {
 			if (ua.w3cdom) {
@@ -676,20 +682,20 @@ var swfobject = function() {
 			}
 		},
 		
-		addDomLoadEvent:addDomLoadEvent,
+		addDomLoadEvent: addDomLoadEvent,
 		
-		addLoadEvent:addLoadEvent,
+		addLoadEvent: addLoadEvent,
 		
 		getQueryParamValue: function(param) {
 			var q = doc.location.search || doc.location.hash;
 			if (param == null) {
-				return q;
+				return urlEncodeIfNecessary(q);
 			}
 		 	if(q) {
 				var pairs = q.substring(1).split("&");
 				for (var i = 0; i < pairs.length; i++) {
 					if (pairs[i].substring(0, pairs[i].indexOf("=")) == param) {
-						return pairs[i].substring((pairs[i].indexOf("=") + 1));
+						return urlEncodeIfNecessary(pairs[i].substring((pairs[i].indexOf("=") + 1)));
 					}
 				}
 			}
