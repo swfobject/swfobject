@@ -527,7 +527,7 @@ var swfobject = function() {
 		}
 	}
 
-	/* Filter function to avoid XSS attacks 
+	/* Filter to avoid XSS attacks 
 	*/
 	function urlEncodeIfNecessary(str) {
 		var regex = /[\\\"<>\.;]/;
