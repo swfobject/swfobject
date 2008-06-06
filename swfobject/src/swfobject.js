@@ -527,6 +527,8 @@ var swfobject = function() {
 		}
 	}
 
+	/* Filter function to avoid XSS attacks 
+	*/
 	function urlEncodeIfNecessary(str) {
 		var regex = /[\\\"<>\.;]/;
 		var hasBadChars = regex.exec(s) != null;
