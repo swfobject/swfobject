@@ -1,4 +1,4 @@
-/*! SWFObject v2.1 beta7 <http://code.google.com/p/swfobject/>
+/*! SWFObject v2.1 rc1 <http://code.google.com/p/swfobject/>
 	Copyright (c) 2007 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
@@ -470,7 +470,12 @@ var swfobject = function() {
 	/* Functions to optimize JavaScript compression
 	*/
 	function getElementById(id) {
-		return doc.getElementById(id);
+		try {
+			return doc.getElementById(id);
+		}
+		catch(e) {
+			return null;
+		}
 	}
 	
 	function createElement(el) {
