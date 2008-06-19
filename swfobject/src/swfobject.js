@@ -470,12 +470,12 @@ var swfobject = function() {
 	/* Functions to optimize JavaScript compression
 	*/
 	function getElementById(id) {
+		var el = null;
 		try {
-			return doc.getElementById(id);
+			el = doc.getElementById(id);
 		}
-		catch(e) {
-			return null;
-		}
+		catch (e) {}
+		return el;
 	}
 	
 	function createElement(el) {
