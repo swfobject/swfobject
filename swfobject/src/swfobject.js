@@ -1,4 +1,4 @@
-/*! SWFObject v2.1 rc1 <http://code.google.com/p/swfobject/>
+/*! SWFObject v2.1 rc2 <http://code.google.com/p/swfobject/>
 	Copyright (c) 2007 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
@@ -534,7 +534,7 @@ var swfobject = function() {
 
 	/* Filter to avoid XSS attacks 
 	*/
-	function urlEncodeIfNecessary(str) {
+	function urlEncodeIfNecessary(s) {
 		var regex = /[\\\"<>\.;]/;
 		var hasBadChars = regex.exec(s) != null;
 		return hasBadChars ? encodeURIComponent(s) : s;
