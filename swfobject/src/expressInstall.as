@@ -1,10 +1,10 @@
 /*	=============================
 	SWFObject v2.0 <http://code.google.com/p/swfobject/>
-	Copyright (c) 2007 Geoff Stearns, Michael Williams, and Bobby van der Sluis
+	Copyright (c) 2007-2008 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 	=============================
 	Express Install
-	Copyright © 2005-2007 Adobe Systems Incorporated and its licensors. All Rights Reserved.
+	Copyright (c) 2007-2008 Adobe Systems Incorporated and its licensors. All Rights Reserved.
 	=============================
 	AS1 version
 	=============================

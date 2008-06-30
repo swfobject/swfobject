@@ -1,5 +1,5 @@
 /*! SWFObject v2.1 rc2 <http://code.google.com/p/swfobject/>
-	Copyright (c) 2007 Geoff Stearns, Michael Williams, and Bobby van der Sluis
+	Copyright (c) 2007-2008 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
 
