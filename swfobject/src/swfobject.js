@@ -1,4 +1,4 @@
-/*! SWFObject v2.2 alpha1 <http://code.google.com/p/swfobject/>
+/*! SWFObject v2.2 alpha2 <http://code.google.com/p/swfobject/>
 	Copyright (c) 2007-2008 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
@@ -81,7 +81,7 @@ var swfobject = function() {
 	*/ 
 	var onDomLoad = function() {
 		if (!ua.w3cdom) { return; }
-		if ((typeof doc.readyState != UNDEF && doc.readyState == "complete") || (typeof doc.readyState == UNDEF && doc.getElementsByTagName("body")[0])) { // function is fired after onload, e.g. when script is inserted dynamically 
+		if ((typeof doc.readyState != UNDEF && doc.readyState == "complete") || (typeof doc.readyState == UNDEF && (doc.getElementsByTagName("body")[0] || doc.body))) { // function is fired after onload, e.g. when script is inserted dynamically 
 			callDomLoadFunctions();
 		}
 		if (ua.ie && ua.win && win == top) { // Internet Explorer on Windows and not inside an iframe
@@ -291,10 +291,10 @@ var swfobject = function() {
 			if (typeof attObj.id == UNDEF) { // if no 'id' is defined for the object element, it will inherit the 'id' from the alternative content
 				attObj.id = id;
 			}
-			if (ua.ie && ua.win) { // IE, the object element and W3C DOM methods do not combine: fall back to outerHTML
+			if (ua.ie && ua.win) { // Internet Explorer + the HTML object element + W3C DOM methods do not combine: fall back to outerHTML
 				var att = "";
 				for (var i in attObj) {
-					if (attObj[i] != Object.prototype[i]) { // Filter out prototype additions from other potential libraries, like Object.prototype.toJSONString = function() {}
+					if (attObj[i] != Object.prototype[i]) { // Filter out prototype additions from other potential libraries
 						if (i.toLowerCase() == "data") {
 							parObj.movie = attObj[i];
 						}
@@ -527,10 +527,8 @@ var swfobject = function() {
 				setVisibility(replaceElemIdStr, false);
 				var att = {};
 				if (attObj && typeof attObj === OBJECT) {
-					for (var i in attObj) {
-						if (attObj[i] != Object.prototype[i]) { // Filter out prototype additions from other potential libraries
-							att[i] = attObj[i];
-						}
+					for (var i in attObj) { // Copy object to avoid the use of references, because web authors often reuse attObj for multiple SWFs
+						att[i] = attObj[i];
 					}
 				}
 				att.data = swfUrlStr;
@@ -538,21 +536,17 @@ var swfobject = function() {
 				att.height = heightStr;
 				var par = {}; 
 				if (parObj && typeof parObj === OBJECT) {
-					for (var j in parObj) {
-						if (parObj[j] != Object.prototype[j]) { // Filter out prototype additions from other potential libraries
-							par[j] = parObj[j];
-						}
+					for (var j in parObj) { // Copy object to avoid the use of references, because web authors often reuse parObj for multiple SWFs
+						par[j] = parObj[j];
 					}
 				}
 				if (flashvarsObj && typeof flashvarsObj === OBJECT) {
-					for (var k in flashvarsObj) {
-						if (flashvarsObj[k] != Object.prototype[k]) { // Filter out prototype additions from other potential libraries
-							if (typeof par.flashvars != UNDEF) {
-								par.flashvars += "&" + k + "=" + flashvarsObj[k];
-							}
-							else {
-								par.flashvars = k + "=" + flashvarsObj[k];
-							}
+					for (var k in flashvarsObj) { // Copy object to avoid the use of references, because web authors often reuse flashvarsObj for multiple SWFs
+						if (typeof par.flashvars != UNDEF) {
+							par.flashvars += "&" + k + "=" + flashvarsObj[k];
+						}
+						else {
+							par.flashvars = k + "=" + flashvarsObj[k];
 						}
 					}
 				}
