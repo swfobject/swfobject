@@ -1,4 +1,4 @@
-/*! SWFObject v2.2 alpha2 <http://code.google.com/p/swfobject/>
+/*! SWFObject v2.2 alpha3 <http://code.google.com/p/swfobject/>
 	Copyright (c) 2007-2008 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
@@ -20,11 +20,11 @@ var swfobject = function() {
 		regObjArr = [],
 		objIdArr = [],
 		listenersArr = [],
-		timer = null,
 		storedAltContent = null,
 		storedAltContentId = null,
 		isDomLoaded = false,
 		isExpressInstallActive = false;
+		dynamicStylesheet = null;
 	
 	/* Centralized function for browser feature detection
 		- Proprietary feature detection (conditional compiling) is used to detect Internet Explorer's features
@@ -84,42 +84,45 @@ var swfobject = function() {
 		if ((typeof doc.readyState != UNDEF && doc.readyState == "complete") || (typeof doc.readyState == UNDEF && (doc.getElementsByTagName("body")[0] || doc.body))) { // function is fired after onload, e.g. when script is inserted dynamically 
 			callDomLoadFunctions();
 		}
+		if (!isDomLoaded) {
+			if (typeof doc.addEventListener != UNDEF) {
+				doc.addEventListener("DOMContentLoaded", callDomLoadFunctions, false);
+			}
+			addLoadEvent(callDomLoadFunctions);
+		}
 		if (ua.ie && ua.win && win == top) { // Internet Explorer on Windows and not inside an iframe
-			timer = setInterval(function() {
-				try { 
+			(function(){
+				if (isDomLoaded) { return; }
+				try {
 					doc.documentElement.doScroll("left");
-					callDomLoadFunctions();
 				}
-				catch(e) {}
-			}, 10);
+				catch(e) {
+					setTimeout(arguments.callee, 0);
+					return;
+				}
+				callDomLoadFunctions();
+			})();
 		}
 		if (ua.webkit) {
-			timer = setInterval(function() {
-				if (/loaded|complete/.test(doc.readyState)) {
-					callDomLoadFunctions();
+			(function(){
+				if (isDomLoaded) { return; }
+				if (!/loaded|complete/.test(doc.readyState)) {
+					setTimeout(arguments.callee, 0);
+					return;
 				}
-			}, 10);
+				callDomLoadFunctions();
+			})();
 		}
-		if (typeof doc.addEventListener != UNDEF) {
-			doc.addEventListener("DOMContentLoaded", callDomLoadFunctions, null);
-		}
-		addLoadEvent(callDomLoadFunctions);
 	}();
 	
 	function callDomLoadFunctions() {
 		if (isDomLoaded) { return; }
-		// Test if we can really add elements to the DOM; we don't want to fire it too early
-		var s = createElement("span");
-		try {
-			var t = doc.getElementsByTagName("body")[0].appendChild(s);
+		try { // Test if we can really add/remove elements to/from the DOM; we don't want to fire it too early
+			var t = doc.getElementsByTagName("body")[0].appendChild(createElement("span"));
 			t.parentNode.removeChild(t);
 		}
 		catch (e) { return; }
 		isDomLoaded = true;
-		if (timer) {
-			clearInterval(timer);
-			timer = null;
-		}
 		var dl = domLoadFnArr.length;
 		for (var i = 0; i < dl; i++) {
 			domLoadFnArr[i]();
@@ -416,23 +419,26 @@ var swfobject = function() {
 	}
 	
 	/* Cross-browser dynamic CSS creation
-		- Based on Bobby van der Sluis' solution: http://www.bobbyvandersluis.com/articles/dynamicCSS.php
 	*/	
 	function createCSS(sel, decl) {
-		if (ua.ie && ua.mac) {
-			return;
+		if (ua.ie && ua.mac) { return; }
+		if (!dynamicStylesheet) { // create dynamic stylesheet + get a global reference to it
+			var s = createElement("style");
+			s.setAttribute("type", "text/css");
+			s.setAttribute("media", "screen");
+			dynamicStylesheet = doc.getElementsByTagName("head")[0].appendChild(s);
+			if (ua.ie && ua.win && typeof doc.styleSheets != UNDEF && doc.styleSheets.length > 0) {
+				dynamicStylesheet = doc.styleSheets[doc.styleSheets.length - 1];
+			}
+		} // add style rule
+		if (ua.ie && ua.win) {
+			if (dynamicStylesheet && typeof dynamicStylesheet.addRule == OBJECT) {
+				dynamicStylesheet.addRule(sel, decl);
+			}
 		}
-		var h = doc.getElementsByTagName("head")[0], s = createElement("style");
-		s.setAttribute("type", "text/css");
-		s.setAttribute("media", "screen");
-		if (!(ua.ie && ua.win) && typeof doc.createTextNode != UNDEF) {
-			s.appendChild(doc.createTextNode(sel + " {" + decl + "}"));
-		}
-		h.appendChild(s);
-		if (ua.ie && ua.win && typeof doc.styleSheets != UNDEF && doc.styleSheets.length > 0) {
-			var ls = doc.styleSheets[doc.styleSheets.length - 1];
-			if (typeof ls.addRule == OBJECT) {
-				ls.addRule(sel, decl);
+		else {
+			if (dynamicStylesheet && typeof doc.createTextNode != UNDEF) {
+				dynamicStylesheet.appendChild(doc.createTextNode(sel + " {" + decl + "}"));
 			}
 		}
 	}
