@@ -1,4 +1,4 @@
-/*! SWFObject v2.2 alpha3 <http://code.google.com/p/swfobject/>
+/*! SWFObject v2.2 alpha4 <http://code.google.com/p/swfobject/>
 	Copyright (c) 2007-2008 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
@@ -23,8 +23,9 @@ var swfobject = function() {
 		storedAltContent = null,
 		storedAltContentId = null,
 		isDomLoaded = false,
-		isExpressInstallActive = false;
-		dynamicStylesheet = null;
+		isExpressInstallActive = false,
+		dynamicStylesheet = null,
+		dynamicStylesheetMedia = null;
 	
 	/* Centralized function for browser feature detection
 		- Proprietary feature detection (conditional compiling) is used to detect Internet Explorer's features
@@ -87,31 +88,39 @@ var swfobject = function() {
 		if (!isDomLoaded) {
 			if (typeof doc.addEventListener != UNDEF) {
 				doc.addEventListener("DOMContentLoaded", callDomLoadFunctions, false);
+			}		
+			if (ua.ie && ua.win) {
+				doc.attachEvent("onreadystatechange", function() {
+					if (doc.readyState == "complete") {
+						doc.detachEvent("onreadystatechange", arguments.callee);
+						callDomLoadFunctions();
+					}
+				});
+				if (win == top) { // if not inside an iframe
+					(function(){
+						if (isDomLoaded) { return; }
+						try {
+							doc.documentElement.doScroll("left");
+						}
+						catch(e) {
+							setTimeout(arguments.callee, 0);
+							return;
+						}
+						callDomLoadFunctions();
+					})();
+				}
+			}
+			if (ua.webkit) {
+				(function(){
+					if (isDomLoaded) { return; }
+					if (!/loaded|complete/.test(doc.readyState)) {
+						setTimeout(arguments.callee, 0);
+						return;
+					}
+					callDomLoadFunctions();
+				})();
 			}
 			addLoadEvent(callDomLoadFunctions);
-		}
-		if (ua.ie && ua.win && win == top) { // Internet Explorer on Windows and not inside an iframe
-			(function(){
-				if (isDomLoaded) { return; }
-				try {
-					doc.documentElement.doScroll("left");
-				}
-				catch(e) {
-					setTimeout(arguments.callee, 0);
-					return;
-				}
-				callDomLoadFunctions();
-			})();
-		}
-		if (ua.webkit) {
-			(function(){
-				if (isDomLoaded) { return; }
-				if (!/loaded|complete/.test(doc.readyState)) {
-					setTimeout(arguments.callee, 0);
-					return;
-				}
-				callDomLoadFunctions();
-			})();
 		}
 	}();
 	
@@ -419,18 +428,27 @@ var swfobject = function() {
 	}
 	
 	/* Cross-browser dynamic CSS creation
+		- Based on Bobby van der Sluis' solution: http://www.bobbyvandersluis.com/articles/dynamicCSS.php
 	*/	
-	function createCSS(sel, decl) {
+	function createCSS(sel, decl, media, newStyle) {
 		if (ua.ie && ua.mac) { return; }
-		if (!dynamicStylesheet) { // create dynamic stylesheet + get a global reference to it
+		var m = (media && typeof media == "string") ? media : "screen";
+		if (newStyle) {
+			dynamicStylesheet = null;
+			dynamicStylesheetMedia = null;
+		}
+		if (!dynamicStylesheet || dynamicStylesheetMedia != m) { 
+			// create dynamic stylesheet + get a global reference to it
 			var s = createElement("style");
 			s.setAttribute("type", "text/css");
-			s.setAttribute("media", "screen");
+			s.setAttribute("media", m);
 			dynamicStylesheet = doc.getElementsByTagName("head")[0].appendChild(s);
 			if (ua.ie && ua.win && typeof doc.styleSheets != UNDEF && doc.styleSheets.length > 0) {
 				dynamicStylesheet = doc.styleSheets[doc.styleSheets.length - 1];
 			}
-		} // add style rule
+			dynamicStylesheetMedia = m;
+		}
+		// add style rule
 		if (ua.ie && ua.win) {
 			if (dynamicStylesheet && typeof dynamicStylesheet.addRule == OBJECT) {
 				dynamicStylesheet.addRule(sel, decl);
@@ -488,7 +506,6 @@ var swfobject = function() {
 			});
 		}
 	}();
-	
 	
 	return {
 		/* Public API
@@ -598,9 +615,9 @@ var swfobject = function() {
 			}
 		},
 		
-		createCSS: function(sel, decl) {
+		createCSS: function(selStr, declStr, mediaStr, newStyleBoolean) {
 			if (ua.w3cdom) {
-				createCSS(sel, decl);
+				createCSS(selStr, declStr, mediaStr, newStyleBoolean);
 			}
 		},
 		
