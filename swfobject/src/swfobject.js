@@ -1,4 +1,4 @@
-/*! SWFObject v2.2 alpha4 <http://code.google.com/p/swfobject/>
+/*! SWFObject v2.2 alpha5 <http://code.google.com/p/swfobject/>
 	Copyright (c) 2007-2008 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
@@ -432,6 +432,8 @@ var swfobject = function() {
 	*/	
 	function createCSS(sel, decl, media, newStyle) {
 		if (ua.ie && ua.mac) { return; }
+		var h = doc.getElementsByTagName("head")[0];
+		if (!h) { return; } // to also support badly authored HTML pages that lack a head element
 		var m = (media && typeof media == "string") ? media : "screen";
 		if (newStyle) {
 			dynamicStylesheet = null;
@@ -442,7 +444,7 @@ var swfobject = function() {
 			var s = createElement("style");
 			s.setAttribute("type", "text/css");
 			s.setAttribute("media", m);
-			dynamicStylesheet = doc.getElementsByTagName("head")[0].appendChild(s);
+			dynamicStylesheet = h.appendChild(s);
 			if (ua.ie && ua.win && typeof doc.styleSheets != UNDEF && doc.styleSheets.length > 0) {
 				dynamicStylesheet = doc.styleSheets[doc.styleSheets.length - 1];
 			}
