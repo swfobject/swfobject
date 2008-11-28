@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application xmlns="http://ns.adobe.com/air/application/1.0">
 	<id>swfobjectgenerator</id>
-	<filename>SWFObject 2 generator v1.1 AIR</filename>
+	<filename>SWFObject 2 generator v1.2 AIR</filename>
 	<version>1.1</version>
 	<description>Generates HTML and JavaScript code for embedding Flash Player content with SWFObject 2</description>
 	<copyright>Copyright (c) 2007-2008 Geoff Stearns, Michael Williams, and Bobby van der Sluis</copyright>
