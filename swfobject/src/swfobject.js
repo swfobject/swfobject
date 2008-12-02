@@ -1,4 +1,4 @@
-/*! SWFObject v2.2 alpha6 <http://code.google.com/p/swfobject/>
+/*! SWFObject v2.2 alpha7 <http://code.google.com/p/swfobject/>
 	Copyright (c) 2007-2008 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
@@ -282,18 +282,23 @@ var swfobject = function() {
 				dt = doc.title,
 				fv = "MMredirectURL=" + win.location + "&MMplayerType=" + pt + "&MMdoctitle=" + dt,
 				replaceId = regObj.id;
-			// For IE when a SWF is loading (AND: not available in cache) wait for the onload event to fire to remove the original object element
-			// In IE you cannot properly cancel a loading SWF file without breaking browser load references, also obj.onreadystatechange doesn't work
+			// IE only: when a SWF is loading (AND: not available in cache) wait for the readyState of the object element to become 4 before removing it,
+			// because you cannot properly cancel a loading SWF file without breaking browser load references, also obj.onreadystatechange doesn't work
 			if (ua.ie && ua.win && obj.readyState != 4) {
 				var newObj = createElement("div");
 				replaceId += "SWFObjectNew";
 				newObj.setAttribute("id", replaceId);
-				obj.parentNode.insertBefore(newObj, obj); // Insert placeholder div that will be replaced by the object element that loads expressinstall.swf
+				obj.parentNode.insertBefore(newObj, obj); // insert placeholder div that will be replaced by the object element that loads expressinstall.swf
 				obj.style.display = "none";
-				var fn = function() {
-					obj.parentNode.removeChild(obj);
-				};
-				addListener(win, "onload", fn);
+				(function(){
+					if (obj.readyState == 4) {
+						obj.parentNode.removeChild(obj);
+					}
+					else {
+						setTimeout(arguments.callee, 10);
+						return;
+					}
+				})();
 			}
 			createSWF({ data:regObj.expressInstall, id:EXPRESS_INSTALL_ID, width:regObj.width, height:regObj.height }, { flashvars:fv }, replaceId);
 		}
@@ -303,16 +308,21 @@ var swfobject = function() {
 	*/
 	function displayAltContent(obj) {
 		if (ua.ie && ua.win && obj.readyState != 4) {
-			// For IE when a SWF is loading (AND: not available in cache) wait for the onload event to fire to remove the original object element
-			// In IE you cannot properly cancel a loading SWF file without breaking browser load references, also obj.onreadystatechange doesn't work
+			// IE only: when a SWF is loading (AND: not available in cache) wait for the readyState of the object element to become 4 before removing it,
+			// because you cannot properly cancel a loading SWF file without breaking browser load references, also obj.onreadystatechange doesn't work
 			var el = createElement("div");
-			obj.parentNode.insertBefore(el, obj); // Insert placeholder div that will be replaced by the alternative content
+			obj.parentNode.insertBefore(el, obj); // insert placeholder div that will be replaced by the alternative content
 			el.parentNode.replaceChild(abstractAltContent(obj), el);
 			obj.style.display = "none";
-			var fn = function() {
-				obj.parentNode.removeChild(obj);
-			};
-			addListener(win, "onload", fn);
+			(function(){
+				if (obj.readyState == 4) {
+					obj.parentNode.removeChild(obj);
+				}
+				else {
+					setTimeout(arguments.callee, 10);
+					return;
+				}
+			})();
 		}
 		else {
 			obj.parentNode.replaceChild(abstractAltContent(obj), obj);
@@ -412,16 +422,18 @@ var swfobject = function() {
 	*/
 	function removeSWF(id) {
 		var obj = getElementById(id);
-		if (obj && (obj.nodeName == "OBJECT" || obj.nodeName == "EMBED")) {
-			if (ua.ie && ua.win) {
-				if (obj.readyState == 4) {
-					removeObjectInIE(id);
-				}
-				else {
-					win.attachEvent("onload", function() {
-						removeObjectInIE(id);
-					});
-				}
+		if (obj && obj.nodeName == "OBJECT") {
+			if (ua.ie && ua.win && obj.readyState != 4) {
+				obj.style.display = "none";
+				(function(){
+					if (obj.readyState == 4) {
+						obj.parentNode.removeChild(obj);
+					}
+					else {
+						setTimeout(arguments.callee, 10);
+						return;
+					}
+				})();
 			}
 			else {
 				obj.parentNode.removeChild(obj);
@@ -482,7 +494,7 @@ var swfobject = function() {
 		var h = doc.getElementsByTagName("head")[0];
 		if (!h) { return; } // to also support badly authored HTML pages that lack a head element
 		var m = (media && typeof media == "string") ? media : "screen";
-		if (newStyle || (dynamicStylesheet && !dynamicStylesheet.parentNode)) { // test if style element hasn't been removed externally
+		if (newStyle) {
 			dynamicStylesheet = null;
 			dynamicStylesheetMedia = null;
 		}
