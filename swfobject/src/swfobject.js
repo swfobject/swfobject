@@ -1,5 +1,5 @@
-/*! SWFObject v2.2 alpha8 <http://code.google.com/p/swfobject/>
-	Copyright (c) 2007-2008 Geoff Stearns, Michael Williams, and Bobby van der Sluis
+/*! SWFObject v2.2 alpha9 <http://code.google.com/p/swfobject/>
+	Copyright (c) 2007-2009 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
 
@@ -24,7 +24,8 @@ var swfobject = function() {
 		listenersArr = [],
 		storedAltContent = null,
 		storedAltContentId = null,
-		storedCallbackFn,
+		storedCallbackFn = null,
+		storedCallbackObj = {success:false},
 		isDomLoaded = false,
 		isExpressInstallActive = false,
 		dynamicStylesheet = null,
@@ -234,26 +235,48 @@ var swfobject = function() {
 			for (var i = 0; i < rl; i++) { // for each registered object element
 				var id = regObjArr[i].id;
 				var cb = regObjArr[i].callbackFn;
+				var cbObj = {success:false, objId:id};
 				if (ua.pv[0] > 0) {
 					var obj = getElementById(id);
 					if (obj) {
-						regObjArr[i].width = obj.getAttribute("width") || "0";
-						regObjArr[i].height = obj.getAttribute("height") || "0";
 						if (hasPlayerVersion(regObjArr[i].swfVersion) && !(ua.webkit && ua.webkit < 312)) { // Flash Player version >= published SWF version: Houston, we have a match!
 							setVisibility(id, true);
-							if (cb) { 
-								cb({success:true, objId:id, objRef:getObjectById(id)});
+							if (cb) {
+								cbObj.success = true;
+								cbObj.objRef = getObjectById(id);
+								cb(cbObj);
 							}
 						}
 						else if (regObjArr[i].expressInstall && !isExpressInstallActive && hasPlayerVersion("6.0.65") && (ua.win || ua.mac) && !(ua.webkit && ua.webkit < 312)) { // show the Adobe Express Install dialog if set by the web page author and if supported (fp6.0.65+ on Win/Mac OS only)
-							storedCallbackFn = cb;
-							showExpressInstall(regObjArr[i]);
+							var att = {};
+							att.data = regObjArr[i].expressInstall;
+							att.width = obj.getAttribute("width") || "0";
+							att.height = obj.getAttribute("height") || "0";
+							if (obj.getAttribute("class")) { att.styleclass = obj.getAttribute("class"); }
+							if (obj.getAttribute("align")) { att.align = obj.getAttribute("align"); }
+							// parse HTML object param element's name-value pairs
+							var par = {};
+							var p = obj.getElementsByTagName("param");
+							var pl = p.length;
+							var parArr = ["play", "loop", "menu", "quality", "scale", "salign", "wmode", "bgcolor", "devicefont", "seamlesstabbing", "swliveconnect", "allowfullscreen", "allowscriptaccess", "allownetworking", "base", "flashvars"];
+							var parArrL = parArr.length;
+							for (var j = 0; j < pl; j++) {
+								for (var jj = 0; jj < parArrL; jj++) {
+									if (p[j].getAttribute("name") == parArr[jj]) { 
+										par[parArr[jj]] = p[j].getAttribute("value");
+										break;
+									}	 
+								}
+							}
+							if (cb) {
+								storedCallbackFn = cb;
+								storedCallbackObj.objId = id;
+							}
+							showExpressInstall(att, par, id);
 						}
 						else { // Flash Player and SWF version mismatch or an older Webkit engine that ignores the HTML object element's nested param elements: display alternative content instead of SWF
 							displayAltContent(obj);
-							if (cb) {
-								cb({success:false});
-							}
+							if (cb) { cb(cbObj); }
 						}
 					}
 				}
@@ -261,12 +284,11 @@ var swfobject = function() {
 					setVisibility(id, true);
 					if (cb) {
 						var o = getObjectById(id); // test whether there is an HTML object element or not
-						if (o) {
-							cb({success:true, objId:id, objRef:o});
+						if (o) { 
+							cbObj.success = true;
+							cbObj.objRef = o;
 						}
-						else {
-							cb({success:false});
-						}
+						cb(cbObj);
 					}
 				}
 			}
@@ -291,37 +313,35 @@ var swfobject = function() {
 	/* Show the Adobe Express Install dialog
 		- Reference: http://www.adobe.com/cfusion/knowledgebase/index.cfm?id=6a253b75
 	*/
-	function showExpressInstall(regObj) {
+	function showExpressInstall(att, par, replaceElemIdStr) {
 		isExpressInstallActive = true;
-		var obj = getElementById(regObj.id);
+		var obj = getElementById(replaceElemIdStr);
 		if (obj) {
-			if (regObj.altContentId) {
-				var ac = getElementById(regObj.altContentId);
-				if (ac) {
-					storedAltContent = ac;
-					storedAltContentId = regObj.altContentId;
-				}
-			}
-			else {
+			if (obj.nodeName == "OBJECT") { // static publishing
 				storedAltContent = abstractAltContent(obj);
 			}
-			if (!(/%$/.test(regObj.width)) && parseInt(regObj.width, 10) < 310) {
-				regObj.width = "310";
+			else { // dynamic publishing
+				storedAltContent = obj;
+				storedAltContentId = replaceElemIdStr;
 			}
-			if (!(/%$/.test(regObj.height)) && parseInt(regObj.height, 10) < 137) {
-				regObj.height = "137";
-			}
+			att.id = EXPRESS_INSTALL_ID;
+			if (typeof att.width == UNDEF || (!/%$/.test(att.width) && parseInt(att.width, 10) < 310)) { att.width = "310"; }
+			if (typeof att.height == UNDEF || (!/%$/.test(att.height) && parseInt(att.height, 10) < 137)) { att.height = "137"; }
 			doc.title = doc.title.slice(0, 47) + " - Flash Player Installation";
 			var pt = ua.ie && ua.win ? "ActiveX" : "PlugIn",
-				dt = doc.title,
-				fv = "MMredirectURL=" + win.location + "&MMplayerType=" + pt + "&MMdoctitle=" + dt,
-				replaceId = regObj.id;
+				fv = "MMredirectURL=" + win.location.toString().replace(/&/g,"%26") + "&MMplayerType=" + pt + "&MMdoctitle=" + doc.title;
+			if (typeof par.flashvars != UNDEF) {
+				par.flashvars += "&" + fv;
+			}
+			else {
+				par.flashvars = fv;
+			}
 			// IE only: when a SWF is loading (AND: not available in cache) wait for the readyState of the object element to become 4 before removing it,
 			// because you cannot properly cancel a loading SWF file without breaking browser load references, also obj.onreadystatechange doesn't work
 			if (ua.ie && ua.win && obj.readyState != 4) {
 				var newObj = createElement("div");
-				replaceId += "SWFObjectNew";
-				newObj.setAttribute("id", replaceId);
+				replaceElemIdStr += "SWFObjectNew";
+				newObj.setAttribute("id", replaceElemIdStr);
 				obj.parentNode.insertBefore(newObj, obj); // insert placeholder div that will be replaced by the object element that loads expressinstall.swf
 				obj.style.display = "none";
 				(function(){
@@ -334,7 +354,7 @@ var swfobject = function() {
 					}
 				})();
 			}
-			createSWF({ data:regObj.expressInstall, id:EXPRESS_INSTALL_ID, width:regObj.width, height:regObj.height }, { flashvars:fv }, replaceId);
+			createSWF(att, par, replaceElemIdStr);
 		}
 	}
 	
@@ -566,12 +586,12 @@ var swfobject = function() {
 		}
 	}
 
-	/* Filter to avoid XSS attacks 
+	/* Filter to avoid XSS attacks
 	*/
 	function urlEncodeIfNecessary(s) {
 		var regex = /[\\\"<>\.;]/;
 		var hasBadChars = regex.exec(s) != null;
-		return hasBadChars ? encodeURIComponent(s) : s;
+		return hasBadChars && typeof encodeURIComponent != UNDEF ? encodeURIComponent(s) : s;
 	}
 	
 	/* Release memory to avoid memory leaks caused by closures, fix hanging audio/video threads and force open sockets/NetConnections to disconnect (Internet Explorer only)
@@ -617,7 +637,7 @@ var swfobject = function() {
 				setVisibility(objectIdStr, false);
 			}
 			else if (callbackFn) {
-				callbackFn({success:false});
+				callbackFn({success:false, objId:objectIdStr});
 			}
 		},
 		
@@ -628,66 +648,62 @@ var swfobject = function() {
 		},
 		
 		embedSWF: function(swfUrlStr, replaceElemIdStr, widthStr, heightStr, swfVersionStr, xiSwfUrlStr, flashvarsObj, parObj, attObj, callbackFn) {
+			var callbackObj = {success:false, altId:replaceElemIdStr};
 			if (ua.w3cdom && !(ua.webkit && ua.webkit < 312) && swfUrlStr && replaceElemIdStr && widthStr && heightStr && swfVersionStr) {
 				setVisibility(replaceElemIdStr, false);
 				addDomLoadEvent(function() {
 					widthStr += ""; // auto-convert to string
 					heightStr += "";
+					var att = {};
+					if (attObj && typeof attObj === OBJECT) {
+						for (var i in attObj) { // copy object to avoid the use of references, because web authors often reuse attObj for multiple SWFs
+							att[i] = attObj[i];
+						}
+					}
+					att.data = swfUrlStr;
+					att.width = widthStr;
+					att.height = heightStr;
+					var par = {}; 
+					if (parObj && typeof parObj === OBJECT) {
+						for (var j in parObj) { // copy object to avoid the use of references, because web authors often reuse parObj for multiple SWFs
+							par[j] = parObj[j];
+						}
+					}
+					if (flashvarsObj && typeof flashvarsObj === OBJECT) {
+						for (var k in flashvarsObj) { // copy object to avoid the use of references, because web authors often reuse flashvarsObj for multiple SWFs
+							if (typeof par.flashvars != UNDEF) {
+								par.flashvars += "&" + k + "=" + flashvarsObj[k];
+							}
+							else {
+								par.flashvars = k + "=" + flashvarsObj[k];
+							}
+						}
+					}
 					if (hasPlayerVersion(swfVersionStr)) { // create SWF
-						var att = {};
-						if (attObj && typeof attObj === OBJECT) {
-							for (var i in attObj) { // copy object to avoid the use of references, because web authors often reuse attObj for multiple SWFs
-								att[i] = attObj[i];
-							}
-						}
-						att.data = swfUrlStr;
-						att.width = widthStr;
-						att.height = heightStr;
-						var par = {}; 
-						if (parObj && typeof parObj === OBJECT) {
-							for (var j in parObj) { // copy object to avoid the use of references, because web authors often reuse parObj for multiple SWFs
-								par[j] = parObj[j];
-							}
-						}
-						if (flashvarsObj && typeof flashvarsObj === OBJECT) {
-							for (var k in flashvarsObj) { // copy object to avoid the use of references, because web authors often reuse flashvarsObj for multiple SWFs
-								if (typeof par.flashvars != UNDEF) {
-									par.flashvars += "&" + k + "=" + flashvarsObj[k];
-								}
-								else {
-									par.flashvars = k + "=" + flashvarsObj[k];
-								}
-							}
-						}
 						var obj = createSWF(att, par, replaceElemIdStr);
 						if (att.id == replaceElemIdStr) {
 							setVisibility(replaceElemIdStr, true);
 						}
-						if (callbackFn) {
-							callbackFn({success:true, altId:replaceElemIdStr, objId:att.id, objRef:obj});
+						callbackObj.success = true;
+						callbackObj.objId = att.id;
+						callbackObj.objRef = obj;
+					}
+					else if (xiSwfUrlStr && !isExpressInstallActive && hasPlayerVersion("6.0.65") && (ua.win || ua.mac) && !(ua.webkit && ua.webkit < 312)) { // show Adobe Express Install
+						att.data = xiSwfUrlStr;
+						if (callbackFn) { 
+							storedCallbackFn = callbackFn;
+							storedCallbackObj.altId = replaceElemIdStr;
 						}
+						showExpressInstall(att, par, replaceElemIdStr);
+						return;
 					}
-					else if (xiSwfUrlStr && !isExpressInstallActive && hasPlayerVersion("6.0.65") && (ua.win || ua.mac)) { // show Adobe Express Install
-						isExpressInstallActive = true;
-						var regObj = {};
-						regObj.id = regObj.altContentId = replaceElemIdStr;
-						regObj.width = widthStr;
-						regObj.height = heightStr;
-						regObj.expressInstall = xiSwfUrlStr;
-						storedCallbackFn = callbackFn;
-						showExpressInstall(regObj);
+					else { // show alternative content
+						setVisibility(replaceElemIdStr, true);
 					}
-					else {
-						setVisibility(replaceElemIdStr, true); // show alternative content
-						if (callbackFn) {
-							callbackFn({success:false});
-						}
-					}
+					if (callbackFn) { callbackFn(callbackObj); }
 				});
 			}
-			else if (callbackFn) {
-				callbackFn({success:false});
-			}
+			else if (callbackFn) { callbackFn(callbackObj);	}
 		},
 		
 		getFlashPlayerVersion: function() {
@@ -702,6 +718,16 @@ var swfobject = function() {
 			}
 			else {
 				return undefined;
+			}
+		},
+		
+		showExpressInstall: function(att, par, replaceElemIdStr, callbackFn) {
+			if (ua.w3cdom && !isExpressInstallActive && hasPlayerVersion("6.0.65") && (ua.win || ua.mac) && !(ua.webkit && ua.webkit < 312)) {
+				if (callbackFn) {
+					storedCallbackFn = callbackFn;
+					storedCallbackObj.altId = replaceElemIdStr;
+				}
+				showExpressInstall(att, par, replaceElemIdStr);
 			}
 		},
 		
@@ -745,15 +771,15 @@ var swfobject = function() {
 					obj.parentNode.replaceChild(storedAltContent, obj);
 					if (storedAltContentId) {
 						setVisibility(storedAltContentId, true);
-						if (ua.ie && ua.win) {
-							storedAltContent.style.display = "block";
-						}
+						if (ua.ie && ua.win) { storedAltContent.style.display = "block"; }
 					}
 					storedAltContent = null;
 					storedAltContentId = null;
 					isExpressInstallActive = false;
-					if (storedCallbackFn) {
-						storedCallbackFn({success:false});
+					if (storedCallbackFn) { 
+						storedCallbackFn(storedCallbackObj);
+						storedCallbackFn = null;
+						storedCallbackObj = {success:false};
 					}
 				}
 			} 
