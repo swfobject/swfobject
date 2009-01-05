@@ -4,7 +4,7 @@
 	<filename>SWFObject 2 generator v1.2 AIR</filename>
 	<version>1.2</version>
 	<description>Generates HTML and JavaScript code for embedding Flash Player content with SWFObject 2</description>
-	<copyright>Copyright (c) 2007-2008 Geoff Stearns, Michael Williams, and Bobby van der Sluis</copyright>
+	<copyright>Copyright (c) 2007-2009 Geoff Stearns, Michael Williams, and Bobby van der Sluis</copyright>
 	<initialWindow>
 		<content>index.html</content>
 		<visible>true</visible>
