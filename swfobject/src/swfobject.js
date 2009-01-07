@@ -1,4 +1,4 @@
-/*! SWFObject v2.2 alpha9 <http://code.google.com/p/swfobject/>
+/*! SWFObject v2.2 alpha10 <http://code.google.com/p/swfobject/>
 	Copyright (c) 2007-2009 Geoff Stearns, Michael Williams, and Bobby van der Sluis
 	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
@@ -22,21 +22,21 @@ var swfobject = function() {
 		regObjArr = [],
 		objIdArr = [],
 		listenersArr = [],
-		storedAltContent = null,
-		storedAltContentId = null,
-		storedCallbackFn = null,
-		storedCallbackObj = {success:false},
+		storedAltContent,
+		storedAltContentId,
+		storedCallbackFn,
+		storedCallbackObj,
 		isDomLoaded = false,
 		isExpressInstallActive = false,
-		dynamicStylesheet = null,
-		dynamicStylesheetMedia = null;
+		dynamicStylesheet,
+		dynamicStylesheetMedia,
 	
 	/* Centralized function for browser feature detection
 		- Proprietary feature detection (conditional compiling) is used to detect Internet Explorer's features
 		- User agent string detection is only used when no alternative is possible
 		- Is executed directly for optimal performance
 	*/	
-	var ua = function() {
+	ua = function() {
 		var w3cdom = typeof doc.getElementById != UNDEF && typeof doc.getElementsByTagName != UNDEF && typeof doc.createElement != UNDEF,
 			playerVersion = [0,0,0],
 			d = null;
@@ -77,16 +77,16 @@ var swfobject = function() {
 				mac = true;
 			@end
 		@*/
-		return { w3cdom:w3cdom, pv:playerVersion, webkit:webkit, ie:ie, win:windows, mac:mac };
-	}();
+		return { w3:w3cdom, pv:playerVersion, wk:webkit, ie:ie, win:windows, mac:mac };
+	}(),
 	
 	/* Cross-browser onDomLoad
 		- Will fire an event as soon as the DOM of a web page is loaded
 		- Internet Explorer workaround based on Diego Perini's solution: http://javascript.nwbox.com/IEContentLoaded/
 		- Regular onload serves as fallback
 	*/ 
-	var onDomLoad = function() {
-		if (!ua.w3cdom) { return; }
+	onDomLoad = function() {
+		if (!ua.w3) { return; }
 		if ((typeof doc.readyState != UNDEF && doc.readyState == "complete") || (typeof doc.readyState == UNDEF && (doc.getElementsByTagName("body")[0] || doc.body))) { // function is fired after onload, e.g. when script is inserted dynamically 
 			callDomLoadFunctions();
 		}
@@ -115,7 +115,7 @@ var swfobject = function() {
 					})();
 				}
 			}
-			if (ua.webkit) {
+			if (ua.wk) {
 				(function(){
 					if (isDomLoaded) { return; }
 					if (!/loaded|complete/.test(doc.readyState)) {
@@ -219,11 +219,11 @@ var swfobject = function() {
 				}
 				b.removeChild(o);
 				t = null;
-				matchVersions();
+				setTimeout(matchVersions, 10); // give object element time to initialize in Firefox
 			})();
 		}
 		else {
-			matchVersions();
+			setTimeout(matchVersions, 10);
 		}
 	}
 	
@@ -235,19 +235,19 @@ var swfobject = function() {
 			for (var i = 0; i < rl; i++) { // for each registered object element
 				var id = regObjArr[i].id;
 				var cb = regObjArr[i].callbackFn;
-				var cbObj = {success:false, objId:id};
+				var cbObj = {success:false, id:id};
 				if (ua.pv[0] > 0) {
 					var obj = getElementById(id);
 					if (obj) {
-						if (hasPlayerVersion(regObjArr[i].swfVersion) && !(ua.webkit && ua.webkit < 312)) { // Flash Player version >= published SWF version: Houston, we have a match!
+						if (hasPlayerVersion(regObjArr[i].swfVersion) && !(ua.wk && ua.wk < 312)) { // Flash Player version >= published SWF version: Houston, we have a match!
 							setVisibility(id, true);
 							if (cb) {
 								cbObj.success = true;
-								cbObj.objRef = getObjectById(id);
+								cbObj.ref = getObjectById(id);
 								cb(cbObj);
 							}
 						}
-						else if (regObjArr[i].expressInstall && !isExpressInstallActive && hasPlayerVersion("6.0.65") && (ua.win || ua.mac) && !(ua.webkit && ua.webkit < 312)) { // show the Adobe Express Install dialog if set by the web page author and if supported (fp6.0.65+ on Win/Mac OS only)
+						else if (regObjArr[i].expressInstall && canExpressInstall()) { // show the Adobe Express Install dialog if set by the web page author and if supported
 							var att = {};
 							att.data = regObjArr[i].expressInstall;
 							att.width = obj.getAttribute("width") || "0";
@@ -258,21 +258,12 @@ var swfobject = function() {
 							var par = {};
 							var p = obj.getElementsByTagName("param");
 							var pl = p.length;
-							var parArr = ["play", "loop", "menu", "quality", "scale", "salign", "wmode", "bgcolor", "devicefont", "seamlesstabbing", "swliveconnect", "allowfullscreen", "allowscriptaccess", "allownetworking", "base", "flashvars"];
-							var parArrL = parArr.length;
 							for (var j = 0; j < pl; j++) {
-								for (var jj = 0; jj < parArrL; jj++) {
-									if (p[j].getAttribute("name") == parArr[jj]) { 
-										par[parArr[jj]] = p[j].getAttribute("value");
-										break;
-									}	 
+								if (p[j].getAttribute("name").toLowerCase() != "movie") {
+									par[p[j].getAttribute("name")] = p[j].getAttribute("value");
 								}
 							}
-							if (cb) {
-								storedCallbackFn = cb;
-								storedCallbackObj.objId = id;
-							}
-							showExpressInstall(att, par, id);
+							showExpressInstall(att, par, id, cb);
 						}
 						else { // Flash Player and SWF version mismatch or an older Webkit engine that ignores the HTML object element's nested param elements: display alternative content instead of SWF
 							displayAltContent(obj);
@@ -286,7 +277,7 @@ var swfobject = function() {
 						var o = getObjectById(id); // test whether there is an HTML object element or not
 						if (o) { 
 							cbObj.success = true;
-							cbObj.objRef = o;
+							cbObj.ref = o;
 						}
 						cb(cbObj);
 					}
@@ -310,15 +301,27 @@ var swfobject = function() {
 		return r;
 	}
 	
+	/* Requirements for Adobe Express Install
+		- only one instance can be active at a time
+		- fp 6.0.65 or higher
+		- Win/Mac OS only 
+	*/
+	function canExpressInstall() {
+		return !isExpressInstallActive && hasPlayerVersion("6.0.65") && (ua.win || ua.mac) && !(ua.wk && ua.wk < 312);
+	}
+	
 	/* Show the Adobe Express Install dialog
 		- Reference: http://www.adobe.com/cfusion/knowledgebase/index.cfm?id=6a253b75
 	*/
-	function showExpressInstall(att, par, replaceElemIdStr) {
+	function showExpressInstall(att, par, replaceElemIdStr, callbackFn) {
 		isExpressInstallActive = true;
+		storedCallbackFn = callbackFn || null;
+		storedCallbackObj = {success:false, id:replaceElemIdStr};
 		var obj = getElementById(replaceElemIdStr);
 		if (obj) {
 			if (obj.nodeName == "OBJECT") { // static publishing
 				storedAltContent = abstractAltContent(obj);
+				storedAltContentId = null;
 			}
 			else { // dynamic publishing
 				storedAltContent = obj;
@@ -350,7 +353,6 @@ var swfobject = function() {
 					}
 					else {
 						setTimeout(arguments.callee, 10);
-						return;
 					}
 				})();
 			}
@@ -374,7 +376,6 @@ var swfobject = function() {
 				}
 				else {
 					setTimeout(arguments.callee, 10);
-					return;
 				}
 			})();
 		}
@@ -409,7 +410,7 @@ var swfobject = function() {
 	*/
 	function createSWF(attObj, parObj, id) {
 		var r, el = getElementById(id);
-		if (ua.webkit && ua.webkit < 312) { return r; }
+		if (ua.wk && ua.wk < 312) { return r; }
 		if (el) {
 			if (typeof attObj.id == UNDEF) { // if no 'id' is defined for the object element, it will inherit the 'id' from the alternative content
 				attObj.id = id;
@@ -477,15 +478,14 @@ var swfobject = function() {
 	function removeSWF(id) {
 		var obj = getElementById(id);
 		if (obj && obj.nodeName == "OBJECT") {
-			if (ua.ie && ua.win && obj.readyState != 4) {
+			if (ua.ie && ua.win) {
 				obj.style.display = "none";
 				(function(){
 					if (obj.readyState == 4) {
-						obj.parentNode.removeChild(obj);
+						removeObjectInIE(id);
 					}
 					else {
 						setTimeout(arguments.callee, 10);
-						return;
 					}
 				})();
 			}
@@ -627,7 +627,7 @@ var swfobject = function() {
 			- Reference: http://code.google.com/p/swfobject/wiki/documentation
 		*/ 
 		registerObject: function(objectIdStr, swfVersionStr, xiSwfUrlStr, callbackFn) {
-			if (ua.w3cdom && objectIdStr && swfVersionStr) {
+			if (ua.w3 && objectIdStr && swfVersionStr) {
 				var regObj = {};
 				regObj.id = objectIdStr;
 				regObj.swfVersion = swfVersionStr;
@@ -637,19 +637,19 @@ var swfobject = function() {
 				setVisibility(objectIdStr, false);
 			}
 			else if (callbackFn) {
-				callbackFn({success:false, objId:objectIdStr});
+				callbackFn({success:false, id:objectIdStr});
 			}
 		},
 		
 		getObjectById: function(objectIdStr) {
-			if (ua.w3cdom) {
+			if (ua.w3) {
 				return getObjectById(objectIdStr);
 			}
 		},
 		
 		embedSWF: function(swfUrlStr, replaceElemIdStr, widthStr, heightStr, swfVersionStr, xiSwfUrlStr, flashvarsObj, parObj, attObj, callbackFn) {
-			var callbackObj = {success:false, altId:replaceElemIdStr};
-			if (ua.w3cdom && !(ua.webkit && ua.webkit < 312) && swfUrlStr && replaceElemIdStr && widthStr && heightStr && swfVersionStr) {
+			var callbackObj = {success:false, id:replaceElemIdStr};
+			if (ua.w3 && !(ua.wk && ua.wk < 312) && swfUrlStr && replaceElemIdStr && widthStr && heightStr && swfVersionStr) {
 				setVisibility(replaceElemIdStr, false);
 				addDomLoadEvent(function() {
 					widthStr += ""; // auto-convert to string
@@ -685,16 +685,11 @@ var swfobject = function() {
 							setVisibility(replaceElemIdStr, true);
 						}
 						callbackObj.success = true;
-						callbackObj.objId = att.id;
-						callbackObj.objRef = obj;
+						callbackObj.ref = obj;
 					}
-					else if (xiSwfUrlStr && !isExpressInstallActive && hasPlayerVersion("6.0.65") && (ua.win || ua.mac) && !(ua.webkit && ua.webkit < 312)) { // show Adobe Express Install
+					else if (xiSwfUrlStr && canExpressInstall()) { // show Adobe Express Install
 						att.data = xiSwfUrlStr;
-						if (callbackFn) { 
-							storedCallbackFn = callbackFn;
-							storedCallbackObj.altId = replaceElemIdStr;
-						}
-						showExpressInstall(att, par, replaceElemIdStr);
+						showExpressInstall(att, par, replaceElemIdStr, callbackFn);
 						return;
 					}
 					else { // show alternative content
@@ -713,7 +708,7 @@ var swfobject = function() {
 		hasFlashPlayerVersion: hasPlayerVersion,
 		
 		createSWF: function(attObj, parObj, replaceElemIdStr) {
-			if (ua.w3cdom) {
+			if (ua.w3) {
 				return createSWF(attObj, parObj, replaceElemIdStr);
 			}
 			else {
@@ -722,23 +717,19 @@ var swfobject = function() {
 		},
 		
 		showExpressInstall: function(att, par, replaceElemIdStr, callbackFn) {
-			if (ua.w3cdom && !isExpressInstallActive && hasPlayerVersion("6.0.65") && (ua.win || ua.mac) && !(ua.webkit && ua.webkit < 312)) {
-				if (callbackFn) {
-					storedCallbackFn = callbackFn;
-					storedCallbackObj.altId = replaceElemIdStr;
-				}
-				showExpressInstall(att, par, replaceElemIdStr);
+			if (ua.w3 && canExpressInstall()) {
+				showExpressInstall(att, par, replaceElemIdStr, callbackFn);
 			}
 		},
 		
 		removeSWF: function(objElemIdStr) {
-			if (ua.w3cdom) {
+			if (ua.w3) {
 				removeSWF(objElemIdStr);
 			}
 		},
 		
 		createCSS: function(selStr, declStr, mediaStr, newStyleBoolean) {
-			if (ua.w3cdom) {
+			if (ua.w3) {
 				createCSS(selStr, declStr, mediaStr, newStyleBoolean);
 			}
 		},
@@ -765,23 +756,17 @@ var swfobject = function() {
 		
 		// For internal usage only
 		expressInstallCallback: function() {
-			if (isExpressInstallActive && storedAltContent) {
+			if (isExpressInstallActive) {
 				var obj = getElementById(EXPRESS_INSTALL_ID);
-				if (obj) {
+				if (obj && storedAltContent) {
 					obj.parentNode.replaceChild(storedAltContent, obj);
 					if (storedAltContentId) {
 						setVisibility(storedAltContentId, true);
 						if (ua.ie && ua.win) { storedAltContent.style.display = "block"; }
 					}
-					storedAltContent = null;
-					storedAltContentId = null;
-					isExpressInstallActive = false;
-					if (storedCallbackFn) { 
-						storedCallbackFn(storedCallbackObj);
-						storedCallbackFn = null;
-						storedCallbackObj = {success:false};
-					}
+					if (storedCallbackFn) { storedCallbackFn(storedCallbackObj); }
 				}
+				isExpressInstallActive = false;
 			} 
 		}
 	};
