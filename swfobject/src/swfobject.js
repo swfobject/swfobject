@@ -1,6 +1,5 @@
-/*! SWFObject v2.2 alpha10 <http://code.google.com/p/swfobject/>
-	Copyright (c) 2007-2009 Geoff Stearns, Michael Williams, and Bobby van der Sluis
-	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
+/*!	SWFObject v2.2 alpha11 <http://code.google.com/p/swfobject/> 
+	is released under the MIT License <http://www.opensource.org/licenses/mit-license.php> 
 */
 
 var swfobject = function() {
@@ -30,14 +29,20 @@ var swfobject = function() {
 		isExpressInstallActive = false,
 		dynamicStylesheet,
 		dynamicStylesheetMedia,
+		autoHideShow = true,
 	
 	/* Centralized function for browser feature detection
-		- Proprietary feature detection (conditional compiling) is used to detect Internet Explorer's features
-		- User agent string detection is only used when no alternative is possible
+		- User agent string detection is only used when no good alternative is possible
 		- Is executed directly for optimal performance
 	*/	
 	ua = function() {
 		var w3cdom = typeof doc.getElementById != UNDEF && typeof doc.getElementsByTagName != UNDEF && typeof doc.createElement != UNDEF,
+			u = nav.userAgent.toLowerCase(),
+			p = nav.platform.toLowerCase(),
+			windows = p ? /win/.test(p) : /win/.test(u),
+			mac = p ? /mac/.test(p) : /mac/.test(u),
+			webkit = /webkit/.test(u) ? parseFloat(u.replace(/^.*webkit\/(\d+(\.\d+)?).*$/, "$1")) : false, // returns either the webkit version or false if not webkit
+			ie = false, // the actual feature test will happen later on
 			playerVersion = [0,0,0],
 			d = null;
 		if (typeof nav.plugins != UNDEF && typeof nav.plugins[SHOCKWAVE_FLASH] == OBJECT) {
@@ -47,7 +52,7 @@ var swfobject = function() {
 				d = d.replace(/^.*\s+(\S+\s+\S+$)/, "$1");
 				playerVersion[0] = parseInt(d.replace(/^(.*)\..*$/, "$1"), 10);
 				playerVersion[1] = parseInt(d.replace(/^.*\.(.*)\s.*$/, "$1"), 10);
-				playerVersion[2] = /r/.test(d) ? parseInt(d.replace(/^.*r(.*)$/, "$1"), 10) : 0;
+				playerVersion[2] = /[a-zA-Z]/.test(d) ? parseInt(d.replace(/^.*[a-zA-Z]+(.*)$/, "$1"), 10) : 0;
 			}
 		}
 		else if (typeof win.ActiveXObject != UNDEF) {
@@ -56,6 +61,7 @@ var swfobject = function() {
 				if (a) { // a will return null when ActiveX is disabled
 					d = a.GetVariable("$version");
 					if (d) {
+						ie = true;
 						d = d.split(" ")[1].split(",");
 						playerVersion = [parseInt(d[0], 10), parseInt(d[1], 10), parseInt(d[2], 10)];
 					}
@@ -63,20 +69,6 @@ var swfobject = function() {
 			}
 			catch(e) {}
 		}
-		var u = nav.userAgent.toLowerCase(),
-			p = nav.platform.toLowerCase(),
-			webkit = /webkit/.test(u) ? parseFloat(u.replace(/^.*webkit\/(\d+(\.\d+)?).*$/, "$1")) : false, // returns either the webkit version or false if not webkit
-			ie = false,
-			windows = p ? /win/.test(p) : /win/.test(u),
-			mac = p ? /mac/.test(p) : /mac/.test(u);
-		/*@cc_on
-			ie = true;
-			@if (@_win32)
-				windows = true;
-			@elif (@_mac)
-				mac = true;
-			@end
-		@*/
 		return { w3:w3cdom, pv:playerVersion, wk:webkit, ie:ie, win:windows, mac:mac };
 	}(),
 	
@@ -304,7 +296,8 @@ var swfobject = function() {
 	/* Requirements for Adobe Express Install
 		- only one instance can be active at a time
 		- fp 6.0.65 or higher
-		- Win/Mac OS only 
+		- Win/Mac OS only
+		- no Webkit engines older than version 312
 	*/
 	function canExpressInstall() {
 		return !isExpressInstallActive && hasPlayerVersion("6.0.65") && (ua.win || ua.mac) && !(ua.wk && ua.wk < 312);
@@ -577,6 +570,7 @@ var swfobject = function() {
 	}
 	
 	function setVisibility(id, isVisible) {
+		if (!autoHideShow) { return; }
 		var v = isVisible ? "visible" : "hidden";
 		if (isDomLoaded && getElementById(id)) {
 			getElementById(id).style.visibility = v;
@@ -701,6 +695,12 @@ var swfobject = function() {
 			else if (callbackFn) { callbackFn(callbackObj);	}
 		},
 		
+		switchOffAutoHideShow: function() {
+			autoHideShow = false;
+		},
+		
+		ua: ua,
+		
 		getFlashPlayerVersion: function() {
 			return { major:ua.pv[0], minor:ua.pv[1], release:ua.pv[2] };
 		},
@@ -740,11 +740,12 @@ var swfobject = function() {
 		
 		getQueryParamValue: function(param) {
 			var q = doc.location.search || doc.location.hash;
-			if (param == null) {
-				return urlEncodeIfNecessary(q);
-			}
 			if (q) {
-				var pairs = q.substring(1).split("&");
+				if (/\?/.test(q)) { q = q.split("?")[1]; } // strip question mark
+				if (param == null) {
+					return urlEncodeIfNecessary(q);
+				}
+				var pairs = q.split("&");
 				for (var i = 0; i < pairs.length; i++) {
 					if (pairs[i].substring(0, pairs[i].indexOf("=")) == param) {
 						return urlEncodeIfNecessary(pairs[i].substring((pairs[i].indexOf("=") + 1)));
