@@ -1,12 +1,5 @@
-/*
-	SWFObject v2.2 <http://code.google.com/p/swfobject/>
-	Copyright (c) 2007-2009 Geoff Stearns, Michael Williams, and Bobby van der Sluis
-	This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
-
-	Express Install
-	Copyright (c) 2007-2008 Adobe Systems Incorporated and its licensors. All Rights Reserved.
-
-	AS1 version
+/*	SWFObject v2.2 <http://code.google.com/p/swfobject/> is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
+	Express Install Copyright (c) 2007-2008 Adobe Systems Incorporated and its licensors. All Rights Reserved.
 */
 
 System.security.allowDomain("fpdownload.macromedia.com");
@@ -15,12 +8,13 @@ var time = 0;
 var timeOut = 5; // in seconds
 var delay = 10; // in milliseconds
 var int_id = setInterval(checkLoaded, delay);
+var old_si = null;
 var loaderClip = this.createEmptyMovieClip("loaderClip", 0);
 var updateSWF = "http://fpdownload.macromedia.com/pub/flashplayer/update/current/swf/autoUpdater.swf?" + Math.random();
 loaderClip.loadMovie(updateSWF);
 
 function checkLoaded(){
-	time += delay/1000;
+	time += delay / 1000;
 	if (time > timeOut) {
 		// updater did not load in time, abort load and force alternative content
 		clearInterval(int_id);
@@ -28,9 +22,15 @@ function checkLoaded(){
 		loadTimeOut();
 	}
 	else if (loaderClip.startInstall.toString() == "[type Function]") {
-		// updater has loaded successfully AND has determined that it can do the express install 
-		clearInterval(int_id);
-		loadComplete();
+		// updater has loaded successfully AND has determined that it can do the express install
+		if (old_si == null) {
+			old_si = loaderClip.startInstall;
+			loaderClip.startInstall = function() {
+				clearInterval(int_id);
+				old_si();
+			}
+			loadComplete();
+		}
 	}	
 }
 
