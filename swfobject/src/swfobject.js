@@ -1,4 +1,4 @@
-/*!	SWFObject v2.2 alpha12 <http://code.google.com/p/swfobject/> 
+/*!	SWFObject v2.2 beta1 <http://code.google.com/p/swfobject/> 
 	is released under the MIT License <http://www.opensource.org/licenses/mit-license.php> 
 */
 
@@ -212,11 +212,11 @@ var swfobject = function() {
 				}
 				b.removeChild(o);
 				t = null;
-				setTimeout(matchVersions, 100); // give object element time to initialize in Firefox
+				matchVersions();
 			})();
 		}
 		else {
-			setTimeout(matchVersions, 100);
+			matchVersions();
 		}
 	}
 	
@@ -268,7 +268,7 @@ var swfobject = function() {
 					setVisibility(id, true);
 					if (cb) {
 						var o = getObjectById(id); // test whether there is an HTML object element or not
-						if (o) { 
+						if (o && typeof o.SetVariable != UNDEF) { 
 							cbObj.success = true;
 							cbObj.ref = o;
 						}
@@ -288,7 +288,7 @@ var swfobject = function() {
 			}
 			else {
 				var n = o.getElementsByTagName(OBJECT)[0];
-				if (n && typeof n.SetVariable != UNDEF) {
+				if (n) {
 					r = n;
 				}
 			}
