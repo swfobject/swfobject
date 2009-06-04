@@ -2,7 +2,7 @@
 	Express Install Copyright (c) 2007-2008 Adobe Systems Incorporated and its licensors. All Rights Reserved.
 */
 
-System.security.allowDomain("fpdownload2.macromedia.com");
+System.security.allowDomain("fpdownload.macromedia.com");
 
 var time = 0;
 var timeOut = 5; // in seconds
@@ -10,7 +10,7 @@ var delay = 10; // in milliseconds
 var int_id = setInterval(checkLoaded, delay);
 var old_si = null;
 var loaderClip = this.createEmptyMovieClip("loaderClip", 0);
-var updateSWF = "http://fpdownload2.macromedia.com/pub/flashplayer/update/current/swf/autoUpdater.swf?" + Math.random();
+var updateSWF = "http://fpdownload.macromedia.com/pub/flashplayer/update/current/swf/autoUpdater.swf?" + Math.random();
 loaderClip.loadMovie(updateSWF);
 
 function checkLoaded(){
