@@ -328,7 +328,7 @@ var swfobject = function() {
 			if (typeof att.height == UNDEF || (!/%$/.test(att.height) && parseInt(att.height, 10) < 137)) { att.height = "137"; }
 			doc.title = doc.title.slice(0, 47) + " - Flash Player Installation";
 			var pt = ua.ie && ua.win ? "ActiveX" : "PlugIn",
-				fv = "MMredirectURL=" + win.location.toString().replace(/&/g,"%26") + "&MMplayerType=" + pt + "&MMdoctitle=" + doc.title;
+				fv = "MMredirectURL=" + encodeURI(win.location).toString().replace(/&/g,"%26") + "&MMplayerType=" + pt + "&MMdoctitle=" + doc.title;
 			if (typeof par.flashvars != UNDEF) {
 				par.flashvars += "&" + fv;
 			}
