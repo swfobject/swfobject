@@ -1,0 +1,3 @@
+= SWFObject
+
+SWFObject is a free, open-source tool for embedding swf content in websites.
