@@ -561,7 +561,7 @@ var swfobject = function() {
 		}
 		// add style rule
 		if (ua.ie && ua.win) {
-			if (dynamicStylesheet && typeof dynamicStylesheet.addRule == OBJECT) {
+			if (dynamicStylesheet && typeof dynamicStylesheet.addRule != UNDEF) {
 				dynamicStylesheet.addRule(sel, decl);
 			}
 		}
