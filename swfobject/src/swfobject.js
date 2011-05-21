@@ -196,10 +196,16 @@ var swfobject = function() {
 			var counter = 0;
 			(function(){
 				if (typeof t.GetVariable != UNDEF) {
-					var d = t.GetVariable("$version");
-					if (d) {
-						d = d.split(" ")[1].split(",");
-						ua.pv = [parseInt(d[0], 10), parseInt(d[1], 10), parseInt(d[2], 10)];
+					try {
+						var d = t.GetVariable("$version");
+						if (d) {
+							d = d.split(" ")[1].split(",");
+							ua.pv = [parseInt(d[0], 10), parseInt(d[1], 10), parseInt(d[2], 10)];
+						}
+					} catch(e){
+						//t.GetVariable("$version") is known to fail in Flash Player 8 on Firefox
+						//If this error is encountered, assume FP8 or lower. Time to upgrade.
+						ua.pv = [8,0,0];
 					}
 				}
 				else if (counter < 10) {
