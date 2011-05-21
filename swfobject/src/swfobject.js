@@ -239,6 +239,7 @@ var swfobject = function() {
 							if (cb) {
 								cbObj.success = true;
 								cbObj.ref = getObjectById(id);
+								cbObj.id = id;
 								cb(cbObj);
 							}
 						}
@@ -273,6 +274,7 @@ var swfobject = function() {
 						if (o && typeof o.SetVariable != UNDEF) { 
 							cbObj.success = true;
 							cbObj.ref = o;
+							cbObj.id = o.id;
 						}
 						cb(cbObj);
 					}
@@ -698,6 +700,7 @@ var swfobject = function() {
 						}
 						callbackObj.success = true;
 						callbackObj.ref = obj;
+						callbackObj.id = obj.id;
 					}
 					else if (xiSwfUrlStr && canExpressInstall()) { // show Adobe Express Install
 						att.data = xiSwfUrlStr;
