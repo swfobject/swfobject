@@ -122,7 +122,7 @@ var swfobject = function() {
 	}();
 	
 	function callDomLoadFunctions() {
-		if (isDomLoaded) { return; }
+		if (isDomLoaded || !document.getElementsByTagName("body")[0]) { return; }
 		try { // test if we can really add/remove elements to/from the DOM; we don't want to fire it too early
 			var t, span = createElement("span");
 			span.style.display = "none"; //hide the span in case someone has styled spans via CSS
