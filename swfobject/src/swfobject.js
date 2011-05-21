@@ -118,7 +118,6 @@ var swfobject = function() {
 					callDomLoadFunctions();
 				})();
 			}
-			addLoadEvent(callDomLoadFunctions);
 		}
 	}();
 	
