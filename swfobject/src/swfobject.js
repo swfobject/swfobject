@@ -17,7 +17,7 @@ var swfobject = function() {
 		nav = navigator,
 		
 		plugin = false,
-		domLoadFnArr = [main],
+		domLoadFnArr = [],
 		regObjArr = [],
 		objIdArr = [],
 		listenersArr = [],
@@ -175,17 +175,6 @@ var swfobject = function() {
 		}
 	}
 	
-	/* Main function
-		- Will preferably execute onDomLoad, otherwise onload (as a fallback)
-	*/
-	function main() { 
-		if (plugin) {
-			testPlayerVersion();
-		}
-		else {
-			matchVersions();
-		}
-	}
 	
 	/* Detect the Flash Player version for non-Internet Explorer browsers
 		- Detecting the plug-in version via the object element is more precise than using the plugins collection item's description:
@@ -286,6 +275,18 @@ var swfobject = function() {
 			}
 		}
 	}
+
+	/* Main function
+		- Will preferably execute onDomLoad, otherwise onload (as a fallback)
+	*/
+	domLoadFnArr[0] = function (){ 
+		if (plugin) {
+			testPlayerVersion();
+		}
+		else {
+			matchVersions();
+		}
+	};
 	
 	function getObjectById(objectIdStr) {
 		var r = null;
