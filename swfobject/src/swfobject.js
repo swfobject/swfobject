@@ -125,8 +125,12 @@ var swfobject = function() {
 	function callDomLoadFunctions() {
 		if (isDomLoaded) { return; }
 		try { // test if we can really add/remove elements to/from the DOM; we don't want to fire it too early
-			var t = doc.getElementsByTagName("body")[0].appendChild(createElement("span"));
+			var t, span = createElement("span");
+			span.style.display = "none"; //hide the span in case someone has styled spans via CSS
+			t = doc.getElementsByTagName("body")[0].appendChild(span);
 			t.parentNode.removeChild(t);
+			t = null; //clear the variables
+			span = null;
 		}
 		catch (e) { return; }
 		isDomLoaded = true;
@@ -193,6 +197,10 @@ var swfobject = function() {
 	function testPlayerVersion() {
 		var b = doc.getElementsByTagName("body")[0];
 		var o = createElement(OBJECT);
+		o.style.position = "absolute";
+		o.style.left = 0;
+		o.style.top = 0;
+		o.setAttribute("wmode", "transparent");
 		o.setAttribute("type", FLASH_MIME_TYPE);
 		var t = b.appendChild(o);
 		if (t) {
