@@ -426,7 +426,7 @@ var swfobject = function() {
 		if (ua.wk && ua.wk < 312) { return r; }
 		if (el) {
 			if (typeof attObj.id == UNDEF) { // if no 'id' is defined for the object element, it will inherit the 'id' from the alternative content
-				attObj.id = id;
+				attObj.id = isElement(id) ? id.id : id; //if id is an element, get the element's ID
 			}
 			if (ua.ie && ua.win) { // Internet Explorer + the HTML object element + W3C DOM methods do not combine: fall back to outerHTML
 				var att = "";
@@ -519,10 +519,18 @@ var swfobject = function() {
 			obj.parentNode.removeChild(obj);
 		}
 	}
+
+	function isElement(id){
+		return (id && id.nodeType && id.nodeType === 1);
+	}
 	
 	/* Functions to optimize JavaScript compression
 	*/
 	function getElementById(id) {
+
+		//Allow users to pass an element OR an element's ID
+		if(isElement(id)){ return id; }
+		
 		var el = null;
 		try {
 			el = doc.getElementById(id);
