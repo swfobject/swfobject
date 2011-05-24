@@ -425,58 +425,73 @@ var swfobject = function() {
 		var r, el = getElementById(id);
 		if (ua.wk && ua.wk < 312) { return r; }
 		if (el) {
+			
+			var o = createElement(OBJECT), //Create plain object
+				file_url = "",
+				m,
+				m_lower,
+				n,
+				div;
+			
 			if (typeof attObj.id == UNDEF) { // if no 'id' is defined for the object element, it will inherit the 'id' from the alternative content
 				attObj.id = isElement(id) ? id.id : id; //if id is an element, get the element's ID
 			}
-			if (ua.ie && ua.win) { // Internet Explorer + the HTML object element + W3C DOM methods do not combine: fall back to outerHTML
-				var att = "";
-				for (var i in attObj) {
-					if (attObj[i] != Object.prototype[i]) { // filter out prototype additions from other potential libraries
-						if (i.toLowerCase() == "data") {
-							parObj.movie = attObj[i];
-						}
-						else if (i.toLowerCase() == "styleclass") { // 'class' is an ECMA4 reserved keyword
-							att += ' class="' + attObj[i] + '"';
-						}
-						else if (i.toLowerCase() != "classid") {
-							att += ' ' + i + '="' + attObj[i] + '"';
-						}
+						
+			//Add attributes and params
+			for (m in attObj) {
+				if (attObj.hasOwnProperty(m)) { // filter out prototype additions from other potential libraries
+					
+					m_lower = m.toLowerCase();
+					
+					if (m_lower == "data") { file_url = attObj[m]; }
+					
+					// 'class' is an ECMA4 reserved keyword
+					if (m_lower == "styleclass") { 
+						o.setAttribute("class", attObj[m]);
+					} else if (m_lower != "classid") { // filter out IE specific attribute
+						o.setAttribute(m, attObj[m]);
 					}
+					
 				}
-				var par = "";
-				for (var j in parObj) {
-					if (parObj[j] != Object.prototype[j]) { // filter out prototype additions from other potential libraries
-						par += '<param name="' + j + '" value="' + parObj[j] + '" />';
-					}
+			}
+			
+			for (n in parObj) {
+				if (parObj.hasOwnProperty(n) && n.toLowerCase() != "movie") { // filter out prototype additions from other potential libraries and IE specific param element
+					createObjParam(o, n, parObj[n]);
 				}
-				el.outerHTML = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"' + att + '>' + par + '</object>';
+			}
+			
+			if (ua.ie && ua.win) { // Internet Explorer + the HTML object element + W3C DOM methods do not combine: fall back to outerHTML				
+				
+				//Set classid for IE
+				o.setAttribute("classid", "clsid:D27CDB6E-AE6D-11cf-96B8-444553540000");
+				
+				//Create required "movie" <param> for IE
+				createObjParam(o, "movie", file_url);
+				
+				//Get object HTML via quickie innerHTML hack then use outerHTML to replace targeted element
+				//Saves us from having to maintain code for two unique objects (one for IE, one for non-IE)
+				//Eliminates prior IE string manipulation that causes some headaches with flashvars
+				div = createElement("div");
+				el.outerHTML = div.innerHTML;
+				div = null;
+				
 				objIdArr[objIdArr.length] = attObj.id; // stored to fix object 'leaks' on unload (dynamic publishing only)
 				r = getElementById(attObj.id);	
-			}
-			else { // well-behaving browsers
-				var o = createElement(OBJECT);
+			
+			} else { // well-behaving browsers
+				
+				//Set object type
 				o.setAttribute("type", FLASH_MIME_TYPE);
-				for (var m in attObj) {
-					if (attObj[m] != Object.prototype[m]) { // filter out prototype additions from other potential libraries
-						if (m.toLowerCase() == "styleclass") { // 'class' is an ECMA4 reserved keyword
-							o.setAttribute("class", attObj[m]);
-						}
-						else if (m.toLowerCase() != "classid") { // filter out IE specific attribute
-							o.setAttribute(m, attObj[m]);
-						}
-					}
-				}
-				for (var n in parObj) {
-					if (parObj[n] != Object.prototype[n] && n.toLowerCase() != "movie") { // filter out prototype additions from other potential libraries and IE specific param element
-						createObjParam(o, n, parObj[n]);
-					}
-				}
+				o.setAttribute("data", file_url);
 				el.parentNode.replaceChild(o, el);
 				r = o;
+			
 			}
 		}
 		return r;
 	}
+
 	
 	function createObjParam(el, pName, pValue) {
 		var p = createElement("param");
