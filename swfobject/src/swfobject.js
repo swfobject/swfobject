@@ -297,20 +297,33 @@ var swfobject = function() {
 	};
 	
 	function getObjectById(objectIdStr) {
-		var r = null;
-		var o = getElementById(objectIdStr);
-		if (o && o.nodeName == "OBJECT") {
-			if (typeof o.SetVariable != UNDEF) {
+		
+		var r = null,
+			o = getElementById(objectIdStr);
+		
+		if (o && o.nodeName === "OBJECT") {
+			
+			//If targeted object is valid Flash file
+			if (typeof o.SetVariable !== UNDEF){
+				
 				r = o;
+			
+			} else {
+				
+				//If SetVariable is not working on targeted object but a nested object is
+				//available, assume classic nested object markup. Return nested object.
+				
+				//If SetVariable is not working on targeted object and there is no nested object,
+				//return the original object anyway. This is probably new simplified markup.
+				
+				r = o.getElementsByTagName(OBJECT)[0] || o;
+	
 			}
-			else {
-				var n = o.getElementsByTagName(OBJECT)[0];
-				if (n) {
-					r = n;
-				}
-			}
+			
 		}
+		
 		return r;
+		
 	}
 	
 	/* Requirements for Adobe Express Install
