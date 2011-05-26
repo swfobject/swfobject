@@ -486,6 +486,7 @@ var swfobject = function() {
 				//Saves us from having to maintain code for two unique objects (one for IE, one for non-IE)
 				//Eliminates prior IE string manipulation that causes some headaches with flashvars
 				div = createElement("div");
+				div.appendChild(o);
 				el.outerHTML = div.innerHTML;
 				div = null;
 				
