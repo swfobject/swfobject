@@ -461,7 +461,7 @@ var swfobject = function() {
 					// 'class' is an ECMA4 reserved keyword
 					if (m_lower == "styleclass") { 
 						o.setAttribute("class", attObj[m]);
-					} else if (m_lower != "classid") { // filter out IE specific attribute
+					} else if (m_lower != "classid" && m_lower != "data") { // These attributes will be set later
 						o.setAttribute(m, attObj[m]);
 					}
 					
@@ -485,8 +485,10 @@ var swfobject = function() {
 				//Get object HTML via quickie innerHTML hack then use outerHTML to replace targeted element
 				//Saves us from having to maintain code for two unique objects (one for IE, one for non-IE)
 				//Eliminates prior IE string manipulation that causes some headaches with flashvars
-				div = createElement("div");
+				
+				var div = document.createElement("div");
 				div.appendChild(o);
+				
 				el.outerHTML = div.innerHTML;
 				div = null;
 				
