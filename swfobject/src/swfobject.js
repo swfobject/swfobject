@@ -432,6 +432,15 @@ var swfobject = function() {
 		return ac;
 	}
 	
+
+	function createIeObject(url){
+		var div = document.createElement("div");
+		div.innerHTML = "<object classid='clsid:D27CDB6E-AE6D-11cf-96B8-444553540000'><param name='movie' value='" +url + "'></object>";
+		var obj = div.firstChild;
+		div = null;
+		return obj;
+	}
+	
 	/* Cross-browser dynamic SWF creation
 	*/
 	function createSWF(attObj, parObj, id) {
@@ -439,71 +448,51 @@ var swfobject = function() {
 		if (ua.wk && ua.wk < 312) { return r; }
 		if (el) {
 			
-			var o = createElement(OBJECT), //Create plain object
-				file_url = "",
-				m,
-				m_lower,
-				n,
-				div;
+			var o = (ua.ie) ? createIeObject(attObj.data) : document.createElement("object"),
+				attr,
+				attr_lower,
+				param;
 			
 			if (typeof attObj.id == UNDEF) { // if no 'id' is defined for the object element, it will inherit the 'id' from the alternative content
 				attObj.id = isElement(id) ? id.id : id; //if id is an element, get the element's ID
 			}
 						
 			//Add attributes and params
-			for (m in attObj) {
-				if (attObj.hasOwnProperty(m)) { // filter out prototype additions from other potential libraries
+			for (attr in attObj) {
+				if (attObj.hasOwnProperty(attr)) { // filter out prototype additions from other potential libraries
 					
-					m_lower = m.toLowerCase();
-					
-					if (m_lower == "data") { file_url = attObj[m]; }
+					attr_lower = attr.toLowerCase();
 					
 					// 'class' is an ECMA4 reserved keyword
-					if (m_lower == "styleclass") { 
-						o.setAttribute("class", attObj[m]);
-					} else if (m_lower != "classid" && m_lower != "data") { // These attributes will be set later
-						o.setAttribute(m, attObj[m]);
+					if (attr_lower === "styleclass") { 
+						o.setAttribute("class", attObj[attr]);
+					} else if (attr_lower !== "classid" && attr_lower !== "data") {
+						o.setAttribute(attr, attObj[attr]);
 					}
 					
 				}
 			}
 			
-			for (n in parObj) {
-				if (parObj.hasOwnProperty(n) && n.toLowerCase() != "movie") { // filter out prototype additions from other potential libraries and IE specific param element
-					createObjParam(o, n, parObj[n]);
+			for (param in parObj) {
+				if (parObj.hasOwnProperty(param) && n.toLowerCase() !== "movie") { // filter out prototype additions from other potential libraries and IE specific param element
+					createObjParam(o, param, parObj[param]);
 				}
 			}
 			
-			if (ua.ie && ua.win) { // Internet Explorer + the HTML object element + W3C DOM methods do not combine: fall back to outerHTML				
-				
-				//Set classid for IE
-				o.setAttribute("classid", "clsid:D27CDB6E-AE6D-11cf-96B8-444553540000");
-				
-				//Create required "movie" <param> for IE
-				createObjParam(o, "movie", file_url);
-				
-				//Get object HTML via quickie innerHTML hack then use outerHTML to replace targeted element
-				//Saves us from having to maintain code for two unique objects (one for IE, one for non-IE)
-				//Eliminates prior IE string manipulation that causes some headaches with flashvars
-				
-				var div = document.createElement("div");
-				div.appendChild(o);
-				
-				el.outerHTML = div.innerHTML;
-				div = null;
-				
+			if (ua.ie && ua.win) {				
+								
 				objIdArr[objIdArr.length] = attObj.id; // stored to fix object 'leaks' on unload (dynamic publishing only)
-				r = getElementById(attObj.id);	
 			
-			} else { // well-behaving browsers
+			} else {
 				
-				//Set object type
 				o.setAttribute("type", FLASH_MIME_TYPE);
-				o.setAttribute("data", file_url);
-				el.parentNode.replaceChild(o, el);
-				r = o;
+				o.setAttribute("data", attObj.data);
 			
 			}
+
+			el.parentNode.replaceChild(o, el);
+			r = o;
+			
 		}
 		return r;
 	}
