@@ -30,6 +30,7 @@ var swfobject = function() {
 		dynamicStylesheet,
 		dynamicStylesheetMedia,
 		autoHideShow = true,
+		encodeURI_enabled = false,
 	
 	/* Centralized function for browser feature detection
 		- User agent string detection is only used when no good alternative is possible
@@ -713,12 +714,17 @@ var swfobject = function() {
 					if (flashvarsObj && typeof flashvarsObj === OBJECT) {
 						for (var k in flashvarsObj) { // copy object to avoid the use of references, because web authors often reuse flashvarsObj for multiple SWFs
 							if(flashvarsObj.hasOwnProperty(k)){
+								
+								var key = (encodeURI_enabled) ? encodeURIComponent(k) : k,
+									value = (encodeURI_enabled) ? encodeURIComponent(flashvarsObj[k]) : flashvarsObj[k];
+								
 								if (typeof par.flashvars != UNDEF) {
-									par.flashvars += "&" + k + "=" + flashvarsObj[k];
+									par.flashvars += "&" + key + "=" + value;
 								}
 								else {
-									par.flashvars = k + "=" + flashvarsObj[k];
+									par.flashvars = key + "=" + value;
 								}
+								
 							}
 						}
 					}
@@ -747,6 +753,10 @@ var swfobject = function() {
 		
 		switchOffAutoHideShow: function() {
 			autoHideShow = false;
+		},
+		
+		enableUriEncoding: function (bool) {
+			encodeURI_enabled = (typeof bool === UNDEF) ? true : bool;
 		},
 		
 		ua: ua,
