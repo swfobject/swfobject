@@ -472,7 +472,7 @@ var swfobject = function() {
 			}
 			
 			for (param in parObj) {
-				if (parObj.hasOwnProperty(param) && n.toLowerCase() !== "movie") { // filter out prototype additions from other potential libraries and IE specific param element
+				if (parObj.hasOwnProperty(param) && param.toLowerCase() !== "movie") { // filter out prototype additions from other potential libraries and IE specific param element
 					createObjParam(o, param, parObj[param]);
 				}
 			}
