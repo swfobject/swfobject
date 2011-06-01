@@ -187,10 +187,7 @@ var swfobject = function() {
 	function testPlayerVersion() {
 		var b = doc.getElementsByTagName("body")[0];
 		var o = createElement(OBJECT);
-		o.style.position = "absolute";
-		o.style.left = 0;
-		o.style.top = 0;
-		o.setAttribute("wmode", "transparent");
+		o.setAttribute("style", "visibility: hidden;");
 		o.setAttribute("type", FLASH_MIME_TYPE);
 		var t = b.appendChild(o);
 		if (t) {
