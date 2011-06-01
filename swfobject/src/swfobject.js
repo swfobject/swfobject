@@ -43,12 +43,12 @@ var swfobject = function() {
 			windows = p ? /win/.test(p) : /win/.test(u),
 			mac = p ? /mac/.test(p) : /mac/.test(u),
 			webkit = /webkit/.test(u) ? parseFloat(u.replace(/^.*webkit\/(\d+(\.\d+)?).*$/, "$1")) : false, // returns either the webkit version or false if not webkit
-			ie = navigator.appName === "Microsoft Internet Explorer",
+			ie = nav.appName === "Microsoft Internet Explorer",
 			playerVersion = [0,0,0],
 			d = null;
 		if (typeof nav.plugins != UNDEF && typeof nav.plugins[SHOCKWAVE_FLASH] == OBJECT) {
 			d = nav.plugins[SHOCKWAVE_FLASH].description;
-			// navigator.mimeTypes["application/x-shockwave-flash"].enabledPlugin indicates whether plug-ins are enabled or disabled in Safari 3+
+			// nav.mimeTypes["application/x-shockwave-flash"].enabledPlugin indicates whether plug-ins are enabled or disabled in Safari 3+
 			if (d && (typeof nav.mimeTypes != UNDEF && nav.mimeTypes[FLASH_MIME_TYPE] && nav.mimeTypes[FLASH_MIME_TYPE].enabledPlugin)){
 				plugin = true;
 				ie = false; // cascaded feature detection for Internet Explorer
@@ -432,7 +432,7 @@ var swfobject = function() {
 	
 
 	function createIeObject(url){
-		var div = document.createElement("div");
+		var div = createElement("div");
 		div.innerHTML = "<object classid='clsid:D27CDB6E-AE6D-11cf-96B8-444553540000'><param name='movie' value='" +url + "'></object>";
 		return div.firstChild;
 	}
@@ -444,7 +444,7 @@ var swfobject = function() {
 		if (ua.wk && ua.wk < 312) { return r; }
 		if (el) {
 			
-			var o = (ua.ie) ? createIeObject(attObj.data) : document.createElement("object"),
+			var o = (ua.ie) ? createIeObject(attObj.data) : createElement(OBJECT),
 				attr,
 				attr_lower,
 				param;
