@@ -30,6 +30,7 @@ var swfobject = function() {
 		dynamicStylesheet,
 		dynamicStylesheetMedia,
 		autoHideShow = true,
+		waitingForElementInit = false,
 	
 	/* Centralized function for browser feature detection
 		- User agent string detection is only used when no good alternative is possible
@@ -122,8 +123,8 @@ var swfobject = function() {
 		}
 	}();
 	
-	function callDomLoadFunctions() {
-		if (isDomLoaded) { return; }
+	function callDomLoadFunctions(force) {
+		if (isDomLoaded && !force) { return; }
 		try { // test if we can really add/remove elements to/from the DOM; we don't want to fire it too early
 			var t = doc.getElementsByTagName("body")[0].appendChild(createElement("span"));
 			t.parentNode.removeChild(t);
@@ -134,10 +135,11 @@ var swfobject = function() {
 		for (var i = 0; i < dl; i++) {
 			domLoadFnArr[i]();
 		}
+		domLoadFnArr = [];
 	}
 	
 	function addDomLoadEvent(fn) {
-		if (isDomLoaded) {
+		if (isDomLoaded && !waitingForElementInit) {
 			fn();
 		}
 		else { 
@@ -204,9 +206,14 @@ var swfobject = function() {
 						d = d.split(" ")[1].split(",");
 						ua.pv = [parseInt(d[0], 10), parseInt(d[1], 10), parseInt(d[2], 10)];
 					}
+					if (waitingForElementInit) {
+						waitingForElementInit = false;
+						if (isDomLoaded) { callDomLoadFunctions(true); }
+					}
 				}
 				else if (counter < 10) {
 					counter++;
+					waitingForElementInit = true; // Prevents dom load functions from firing during this retry.
 					setTimeout(arguments.callee, 10);
 					return;
 				}
