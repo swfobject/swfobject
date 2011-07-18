@@ -17,7 +17,7 @@ var swfobject = function() {
 		nav = navigator,
 		
 		plugin = false,
-		domLoadFnArr = [main],
+		domLoadFnArr = [],
 		regObjArr = [],
 		objIdArr = [],
 		listenersArr = [],
@@ -30,6 +30,8 @@ var swfobject = function() {
 		dynamicStylesheet,
 		dynamicStylesheetMedia,
 		autoHideShow = true,
+		testingVersion = false,
+		versionTested = false,
 	
 	/* Centralized function for browser feature detection
 		- User agent string detection is only used when no good alternative is possible
@@ -122,7 +124,22 @@ var swfobject = function() {
 		}
 	}();
 	
+	/* callDomLoadFunctions
+		- Will preferably execute onDomLoad, otherwise onload (as a fallback)
+	*/
 	function callDomLoadFunctions() {
+		
+		// This code was in main() but has been consolidated here to easier enforce order of operations. 
+		if (!versionTested) {
+			if (plugin) {
+				if (testPlayerVersion() == true) { return; } // wait
+			}
+			else {
+				matchVersions();
+				versionTested = true;
+			}
+		}
+		
 		if (isDomLoaded) { return; }
 		try { // test if we can really add/remove elements to/from the DOM; we don't want to fire it too early
 			var t = doc.getElementsByTagName("body")[0].appendChild(createElement("span"));
@@ -134,10 +151,11 @@ var swfobject = function() {
 		for (var i = 0; i < dl; i++) {
 			domLoadFnArr[i]();
 		}
+		domLoadFnArr = [];
 	}
 	
 	function addDomLoadEvent(fn) {
-		if (isDomLoaded) {
+		if (versionTested && isDomLoaded) {
 			fn();
 		}
 		else { 
@@ -171,30 +189,21 @@ var swfobject = function() {
 		}
 	}
 	
-	/* Main function
-		- Will preferably execute onDomLoad, otherwise onload (as a fallback)
-	*/
-	function main() { 
-		if (plugin) {
-			testPlayerVersion();
-		}
-		else {
-			matchVersions();
-		}
-	}
-	
 	/* Detect the Flash Player version for non-Internet Explorer browsers
 		- Detecting the plug-in version via the object element is more precise than using the plugins collection item's description:
 		  a. Both release and build numbers can be detected
 		  b. Avoid wrong descriptions by corrupt installers provided by Adobe
 		  c. Avoid wrong descriptions by multiple Flash Player entries in the plugin Array, caused by incorrect browser imports
 		- Disadvantage of this method is that it depends on the availability of the DOM, while the plugins collection is immediately available
+		- Returns true to indicate if we're waiting to try and get the real version from the DOM.
 	*/
 	function testPlayerVersion() {
+		if (testingVersion) { return true; }
 		var b = doc.getElementsByTagName("body")[0];
 		var o = createElement(OBJECT);
 		o.setAttribute("type", FLASH_MIME_TYPE);
 		var t = b.appendChild(o);
+		var rv = false;
 		if (t) {
 			var counter = 0;
 			(function(){
@@ -206,18 +215,25 @@ var swfobject = function() {
 					}
 				}
 				else if (counter < 10) {
+					testingVersion = true;
 					counter++;
 					setTimeout(arguments.callee, 10);
-					return;
+					rv = true;
+					return; // from local closure only
 				}
+				
+				testingVersion = false;
+				versionTested = true;
 				b.removeChild(o);
 				t = null;
 				matchVersions();
+				callDomLoadFunctions();
 			})();
 		}
 		else {
 			matchVersions();
 		}
+		return rv;
 	}
 	
 	/* Perform Flash Player and SWF version matching; static publishing only
