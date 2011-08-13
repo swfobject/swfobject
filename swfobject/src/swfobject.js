@@ -88,20 +88,20 @@ var swfobject = function() {
 				doc.addEventListener("DOMContentLoaded", callDomLoadFunctions, false);
 			}		
 			if (ua.ie && ua.win) {
-				doc.attachEvent(ON_READY_STATE_CHANGE, function() {
+				doc.attachEvent(ON_READY_STATE_CHANGE, function detachDOMContentLoaded() {
 					if (doc.readyState == "complete") {
-						doc.detachEvent(ON_READY_STATE_CHANGE, arguments.callee);
+						doc.detachEvent(ON_READY_STATE_CHANGE, detachDOMContentLoaded);
 						callDomLoadFunctions();
 					}
 				});
 				if (win == top) { // if not inside an iframe
-					(function(){
+					(function ieDomLoadCheck(){
 						if (isDomLoaded) { return; }
 						try {
 							doc.documentElement.doScroll("left");
 						}
 						catch(e) {
-							setTimeout(arguments.callee, 0);
+							setTimeout(ieDomLoadCheck, 0);
 							return;
 						}
 						callDomLoadFunctions();
@@ -109,10 +109,10 @@ var swfobject = function() {
 				}
 			}
 			if (ua.wk) {
-				(function(){
+				(function webkitDomLoadCheck(){
 					if (isDomLoaded) { return; }
 					if (!/loaded|complete/.test(doc.readyState)) {
-						setTimeout(arguments.callee, 0);
+						setTimeout(webkitDomLoadCheck, 0);
 						return;
 					}
 					callDomLoadFunctions();
@@ -197,7 +197,7 @@ var swfobject = function() {
 		var t = b.appendChild(o);
 		if (t) {
 			var counter = 0;
-			(function(){
+			(function checkVersion(){
 				if (typeof t.GetVariable != UNDEF) {
 					var d = t.GetVariable("$version");
 					if (d) {
@@ -207,7 +207,7 @@ var swfobject = function() {
 				}
 				else if (counter < 10) {
 					counter++;
-					setTimeout(arguments.callee, 10);
+					setTimeout(checkVersion, 10);
 					return;
 				}
 				b.removeChild(o);
@@ -306,6 +306,16 @@ var swfobject = function() {
 		return !isExpressInstallActive && hasPlayerVersion("6.0.65") && (ua.win || ua.mac) && !(ua.wk && ua.wk < 312);
 	}
 	
+	/* Utility function pulled out of showExpressInstall and displayAltContent for DRY reasons */
+	function removeChildObj(obj){
+		if (obj.readyState == 4) {
+			obj.parentNode.removeChild(obj);
+		}
+		else {
+			setTimeout(removeChildObj, 10);
+		}
+	}
+
 	/* Show the Adobe Express Install dialog
 		- Reference: http://www.adobe.com/cfusion/knowledgebase/index.cfm?id=6a253b75
 	*/
@@ -343,19 +353,12 @@ var swfobject = function() {
 				newObj.setAttribute("id", replaceElemIdStr);
 				obj.parentNode.insertBefore(newObj, obj); // insert placeholder div that will be replaced by the object element that loads expressinstall.swf
 				obj.style.display = "none";
-				(function(){
-					if (obj.readyState == 4) {
-						obj.parentNode.removeChild(obj);
-					}
-					else {
-						setTimeout(arguments.callee, 10);
-					}
-				})();
+				removeChildObj(obj);
 			}
 			createSWF(att, par, replaceElemIdStr);
 		}
 	}
-	
+		
 	/* Functions to abstract and display alternative content
 	*/
 	function displayAltContent(obj) {
@@ -366,14 +369,7 @@ var swfobject = function() {
 			obj.parentNode.insertBefore(el, obj); // insert placeholder div that will be replaced by the alternative content
 			el.parentNode.replaceChild(abstractAltContent(obj), el);
 			obj.style.display = "none";
-			(function(){
-				if (obj.readyState == 4) {
-					obj.parentNode.removeChild(obj);
-				}
-				else {
-					setTimeout(arguments.callee, 10);
-				}
-			})();
+			removeChildObj(obj);
 		}
 		else {
 			obj.parentNode.replaceChild(abstractAltContent(obj), obj);
@@ -476,12 +472,12 @@ var swfobject = function() {
 		if (obj && obj.nodeName == "OBJECT") {
 			if (ua.ie && ua.win) {
 				obj.style.display = "none";
-				(function(){
+				(function checkReadyState(){
 					if (obj.readyState == 4) {
 						removeObjectInIE(id);
 					}
 					else {
-						setTimeout(arguments.callee, 10);
+						setTimeout(checkReadyState, 10);
 					}
 				})();
 			}
