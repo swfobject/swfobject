@@ -427,9 +427,9 @@ var swfobject = function() {
 	}
 
 
-	function createIeObject(url){
+	function createIeObject(url, param_str){
 		var div = createElement("div");
-		div.innerHTML = "<object classid='clsid:D27CDB6E-AE6D-11cf-96B8-444553540000'><param name='movie' value='" +url + "'></object>";
+		div.innerHTML = "<object classid='clsid:D27CDB6E-AE6D-11cf-96B8-444553540000'><param name='movie' value='" +url + "'>" + param_str + "</object>";
 		return div.firstChild;
 	}
 
@@ -440,7 +440,7 @@ var swfobject = function() {
 		if (ua.wk && ua.wk < 312) { return r; }
 		if (el) {
 
-			var o = (ua.ie) ? createIeObject(attObj.data) : createElement(OBJECT),
+			var o = (ua.ie) ? createElement("div") : createElement(OBJECT),
 				attr,
 				attr_lower,
 				param;
@@ -449,7 +449,18 @@ var swfobject = function() {
 				attObj.id = isElement(id) ? id.id : id; //if id is an element, get the element's ID
 			}
 
-			//Add attributes and params
+			//Add params
+			for (param in parObj) {
+				//filter out prototype additions from other potential libraries and IE specific param element
+				if (parObj.hasOwnProperty(param) && param.toLowerCase() !== "movie") {
+					createObjParam(o, param, parObj[param]);
+				}
+			}
+
+			//Create IE object, complete with param nodes
+			if(ua.ie){ o = createIeObject(attObj.data, o.innerHTML); }
+
+			//Add attributes to object
 			for (attr in attObj) {
 				if (attObj.hasOwnProperty(attr)) { // filter out prototype additions from other potential libraries
 
@@ -462,12 +473,6 @@ var swfobject = function() {
 						o.setAttribute(attr, attObj[attr]);
 					}
 
-				}
-			}
-
-			for (param in parObj) {
-				if (parObj.hasOwnProperty(param) && param.toLowerCase() !== "movie") { // filter out prototype additions from other potential libraries and IE specific param element
-					createObjParam(o, param, parObj[param]);
 				}
 			}
 
