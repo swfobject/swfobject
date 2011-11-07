@@ -335,13 +335,13 @@ var swfobject = function() {
 	}
 
 	/* Utility function pulled out of showExpressInstall and displayFbContent for DRY reasons */
-	function removeChildObj(obj){
+	function removeIeObject(obj){
 		if(!obj){ return; }
 		if (obj.readyState == 4) {
 			obj.parentNode.removeChild(obj);
 		}
 		else {
-			setTimeout(function (){ removeChildObj(obj); }, 10);
+			setTimeout(function (){ removeIeObject(obj); }, 10);
 		}
 	}
 
@@ -382,7 +382,7 @@ var swfobject = function() {
 				newObj.setAttribute("id", replaceElemIdStr);
 				obj.parentNode.insertBefore(newObj, obj); // insert placeholder div that will be replaced by the object element that loads expressinstall.swf
 				obj.style.display = "none";
-				removeChildObj(obj);
+				removeIeObject(obj);
 			}
 			createSWF(att, par, replaceElemIdStr);
 		}
@@ -398,7 +398,7 @@ var swfobject = function() {
 			var el = createElement("div");
 			obj.parentNode.insertBefore(el, obj); // insert placeholder div that will be replaced by the fallback content
 			el.parentNode.replaceChild(abstractFbContent(obj), el);
-			removeChildObj(obj);
+			removeIeObject(obj);
 		}
 		else {
 			obj.parentNode.replaceChild(abstractFbContent(obj), obj);
