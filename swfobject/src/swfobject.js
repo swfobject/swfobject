@@ -393,10 +393,10 @@ var swfobject = function() {
 		if (ua.ie && obj.readyState != 4) {
 			// IE only: when a SWF is loading (AND: not available in cache) wait for the readyState of the object element to become 4 before removing it,
 			// because you cannot properly cancel a loading SWF file without breaking browser load references, also obj.onreadystatechange doesn't work
+			obj.style.display = "none";
 			var el = createElement("div");
 			obj.parentNode.insertBefore(el, obj); // insert placeholder div that will be replaced by the fallback content
 			el.parentNode.replaceChild(abstractFbContent(obj), el);
-			obj.style.display = "none";
 			removeChildObj(obj);
 		}
 		else {
