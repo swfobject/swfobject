@@ -89,7 +89,7 @@ var swfobject = function() {
 			if (typeof doc.addEventListener != UNDEF) {
 				doc.addEventListener("DOMContentLoaded", callDomLoadFunctions, false);
 			}
-			if (ua.ie && ua.win) {
+			if (ua.ie) {
 				doc.attachEvent(ON_READY_STATE_CHANGE, function detach() {
 					if (doc.readyState == "complete") {
 						doc.detachEvent(ON_READY_STATE_CHANGE, detach);
@@ -365,7 +365,7 @@ var swfobject = function() {
 			if (typeof att.width == UNDEF || (!/%$/.test(att.width) && parseInt(att.width, 10) < 310)) { att.width = "310"; }
 			if (typeof att.height == UNDEF || (!/%$/.test(att.height) && parseInt(att.height, 10) < 137)) { att.height = "137"; }
 			doc.title = doc.title.slice(0, 47) + " - Flash Player Installation";
-			var pt = ua.ie && ua.win ? "ActiveX" : "PlugIn",
+			var pt = ua.ie ? "ActiveX" : "PlugIn",
 				fv = "MMredirectURL=" + encodeURIComponent(win.location.toString().replace(/&/g,"%26")) + "&MMplayerType=" + pt + "&MMdoctitle=" + doc.title;
 			if (typeof par.flashvars != UNDEF) {
 				par.flashvars += "&" + fv;
@@ -375,7 +375,7 @@ var swfobject = function() {
 			}
 			// IE only: when a SWF is loading (AND: not available in cache) wait for the readyState of the object element to become 4 before removing it,
 			// because you cannot properly cancel a loading SWF file without breaking browser load references, also obj.onreadystatechange doesn't work
-			if (ua.ie && ua.win && obj.readyState != 4) {
+			if (ua.ie && obj.readyState != 4) {
 				var newObj = createElement("div");
 				replaceElemIdStr += "SWFObjectNew";
 				newObj.setAttribute("id", replaceElemIdStr);
@@ -390,7 +390,7 @@ var swfobject = function() {
 	/* Functions to abstract and display alternative content
 	*/
 	function displayAltContent(obj) {
-		if (ua.ie && ua.win && obj.readyState != 4) {
+		if (ua.ie && obj.readyState != 4) {
 			// IE only: when a SWF is loading (AND: not available in cache) wait for the readyState of the object element to become 4 before removing it,
 			// because you cannot properly cancel a loading SWF file without breaking browser load references, also obj.onreadystatechange doesn't work
 			var el = createElement("div");
@@ -476,7 +476,7 @@ var swfobject = function() {
 				}
 			}
 
-			if (ua.ie && ua.win) {
+			if (ua.ie) {
 
 				objIdArr[objIdArr.length] = attObj.id; // stored to fix object 'leaks' on unload (dynamic publishing only)
 
@@ -508,7 +508,7 @@ var swfobject = function() {
 	function removeSWF(id) {
 		var obj = getElementById(id);
 		if (obj && obj.nodeName == "OBJECT") {
-			if (ua.ie && ua.win) {
+			if (ua.ie) {
 				obj.style.display = "none";
 				(function removeSWFInIE(){
 					if (obj.readyState == 4) {
@@ -597,13 +597,13 @@ var swfobject = function() {
 			s.setAttribute("type", "text/css");
 			s.setAttribute("media", m);
 			dynamicStylesheet = h.appendChild(s);
-			if (ua.ie && ua.win && typeof doc.styleSheets != UNDEF && doc.styleSheets.length > 0) {
+			if (ua.ie && typeof doc.styleSheets != UNDEF && doc.styleSheets.length > 0) {
 				dynamicStylesheet = doc.styleSheets[doc.styleSheets.length - 1];
 			}
 			dynamicStylesheetMedia = m;
 		}
 		// add style rule
-		if (ua.ie && ua.win) {
+		if (ua.ie) {
 			if (dynamicStylesheet && typeof dynamicStylesheet.addRule != UNDEF) {
 				dynamicStylesheet.addRule(sel, decl);
 			}
@@ -637,7 +637,7 @@ var swfobject = function() {
 	/* Release memory to avoid memory leaks caused by closures, fix hanging audio/video threads and force open sockets/NetConnections to disconnect (Internet Explorer only)
 	*/
 	var cleanup = function() {
-		if (ua.ie && ua.win) {
+		if (ua.ie) {
 			window.attachEvent("onunload", function() {
 				// remove listeners to avoid memory leaks
 				var ll = listenersArr.length;
@@ -821,7 +821,7 @@ var swfobject = function() {
 					obj.parentNode.replaceChild(storedAltContent, obj);
 					if (storedAltContentId) {
 						setVisibility(storedAltContentId, true);
-						if (ua.ie && ua.win) { storedAltContent.style.display = "block"; }
+						if (ua.ie) { storedAltContent.style.display = "block"; }
 					}
 					if (storedCallbackFn) { storedCallbackFn(storedCallbackObj); }
 				}
