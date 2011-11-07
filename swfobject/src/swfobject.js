@@ -21,8 +21,8 @@ var swfobject = function() {
 		regObjArr = [],
 		objIdArr = [],
 		listenersArr = [],
-		storedAltContent,
-		storedAltContentId,
+		storedFbContent,
+		storedFbContentId,
 		storedCallbackFn,
 		storedCallbackObj,
 		isDomLoaded = false,
@@ -260,13 +260,13 @@ var swfobject = function() {
 							}
 							showExpressInstall(att, par, id, cb);
 						}
-						else { // Flash Player and SWF version mismatch or an older Webkit engine that ignores the HTML object element's nested param elements: display alternative content instead of SWF
-							displayAltContent(obj);
+						else { // Flash Player and SWF version mismatch or an older Webkit engine that ignores the HTML object element's nested param elements: display fallback content instead of SWF
+							displayFbContent(obj);
 							if (cb) { cb(cbObj); }
 						}
 					}
 				}
-				else {	// if no Flash Player is installed or the fp version cannot be detected we let the HTML object element do its job (either show a SWF or alternative content)
+				else {	// if no Flash Player is installed or the fp version cannot be detected we let the HTML object element do its job (either show a SWF or fallback content)
 					setVisibility(id, true);
 					if (cb) {
 						var o = getObjectById(id); // test whether there is an HTML object element or not
@@ -334,7 +334,7 @@ var swfobject = function() {
 		return !isExpressInstallActive && hasPlayerVersion("6.0.65") && (ua.win || ua.mac) && !(ua.wk && ua.wk < 312);
 	}
 
-	/* Utility function pulled out of showExpressInstall and displayAltContent for DRY reasons */
+	/* Utility function pulled out of showExpressInstall and displayFbContent for DRY reasons */
 	function removeChildObj(obj){
 		if (obj && obj.readyState == 4) {
 			obj.parentNode.removeChild(obj);
@@ -354,12 +354,12 @@ var swfobject = function() {
 		var obj = getElementById(replaceElemIdStr);
 		if (obj) {
 			if (obj.nodeName == "OBJECT") { // static publishing
-				storedAltContent = abstractAltContent(obj);
-				storedAltContentId = null;
+				storedFbContent = abstractFbContent(obj);
+				storedFbContentId = null;
 			}
 			else { // dynamic publishing
-				storedAltContent = obj;
-				storedAltContentId = replaceElemIdStr;
+				storedFbContent = obj;
+				storedFbContentId = replaceElemIdStr;
 			}
 			att.id = EXPRESS_INSTALL_ID;
 			if (typeof att.width == UNDEF || (!/%$/.test(att.width) && parseInt(att.width, 10) < 310)) { att.width = "310"; }
@@ -387,24 +387,24 @@ var swfobject = function() {
 		}
 	}
 
-	/* Functions to abstract and display alternative content
+	/* Functions to abstract and display fallback content
 	*/
-	function displayAltContent(obj) {
+	function displayFbContent(obj) {
 		if (ua.ie && obj.readyState != 4) {
 			// IE only: when a SWF is loading (AND: not available in cache) wait for the readyState of the object element to become 4 before removing it,
 			// because you cannot properly cancel a loading SWF file without breaking browser load references, also obj.onreadystatechange doesn't work
 			var el = createElement("div");
-			obj.parentNode.insertBefore(el, obj); // insert placeholder div that will be replaced by the alternative content
-			el.parentNode.replaceChild(abstractAltContent(obj), el);
+			obj.parentNode.insertBefore(el, obj); // insert placeholder div that will be replaced by the fallback content
+			el.parentNode.replaceChild(abstractFbContent(obj), el);
 			obj.style.display = "none";
 			removeChildObj(obj);
 		}
 		else {
-			obj.parentNode.replaceChild(abstractAltContent(obj), obj);
+			obj.parentNode.replaceChild(abstractFbContent(obj), obj);
 		}
 	}
 
-	function abstractAltContent(obj) {
+	function abstractFbContent(obj) {
 		var ac = createElement("div");
 		if (ua.win && ua.ie) {
 			ac.innerHTML = obj.innerHTML;
@@ -445,7 +445,7 @@ var swfobject = function() {
 				attr_lower,
 				param;
 
-			if (typeof attObj.id == UNDEF) { // if no 'id' is defined for the object element, it will inherit the 'id' from the alternative content
+			if (typeof attObj.id == UNDEF) { // if no 'id' is defined for the object element, it will inherit the 'id' from the fallback content
 				attObj.id = isElement(id) ? id.id : id; //if id is an element, get the element's ID
 			}
 
@@ -740,7 +740,7 @@ var swfobject = function() {
 						showExpressInstall(att, par, replaceElemIdStr, callbackFn);
 						return;
 					}
-					else { // show alternative content
+					else { // show fallback content
 						setVisibility(replaceElemIdStr, true);
 					}
 					if (callbackFn) { callbackFn(callbackObj); }
@@ -817,11 +817,11 @@ var swfobject = function() {
 		expressInstallCallback: function() {
 			if (isExpressInstallActive) {
 				var obj = getElementById(EXPRESS_INSTALL_ID);
-				if (obj && storedAltContent) {
-					obj.parentNode.replaceChild(storedAltContent, obj);
-					if (storedAltContentId) {
-						setVisibility(storedAltContentId, true);
-						if (ua.ie) { storedAltContent.style.display = "block"; }
+				if (obj && storedFbContent) {
+					obj.parentNode.replaceChild(storedFbContent, obj);
+					if (storedFbContentId) {
+						setVisibility(storedFbContentId, true);
+						if (ua.ie) { storedFbContent.style.display = "block"; }
 					}
 					if (storedCallbackFn) { storedCallbackFn(storedCallbackObj); }
 				}
