@@ -336,11 +336,12 @@ var swfobject = function() {
 
 	/* Utility function pulled out of showExpressInstall and displayFbContent for DRY reasons */
 	function removeChildObj(obj){
-		if (obj && obj.readyState == 4) {
+		if(!obj){ return; }
+		if (obj.readyState == 4) {
 			obj.parentNode.removeChild(obj);
 		}
 		else {
-			setTimeout(removeChildObj, 10);
+			setTimeout(function (){ removeChildObj(obj); }, 10);
 		}
 	}
 
