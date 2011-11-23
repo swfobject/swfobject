@@ -584,10 +584,9 @@ var swfobject = function() {
 		- Based on Bobby van der Sluis' solution: http://www.bobbyvandersluis.com/articles/dynamicCSS.php
 	*/
 	function createCSS(sel, decl, media, newStyle) {
-		if (ua.ie && ua.mac) { return; }
 		var h = doc.getElementsByTagName("head")[0];
 		if (!h) { return; } // to also support badly authored HTML pages that lack a head element
-		var m = (media && typeof media == "string") ? media : "screen";
+		var m = (typeof media == "string") ? media : "screen";
 		if (newStyle) {
 			dynamicStylesheet = null;
 			dynamicStylesheetMedia = null;
@@ -604,14 +603,11 @@ var swfobject = function() {
 			dynamicStylesheetMedia = m;
 		}
 		// add style rule
-		if (ua.ie) {
-			if (dynamicStylesheet && typeof dynamicStylesheet.addRule != UNDEF) {
-				dynamicStylesheet.addRule(sel, decl);
-			}
-		}
-		else {
-			if (dynamicStylesheet && typeof doc.createTextNode != UNDEF) {
-				dynamicStylesheet.appendChild(doc.createTextNode(sel + " {" + decl + "}"));
+		if(dynamicStylesheet){
+			if (typeof dynamicStylesheet.addRule != UNDEF) {
+				dynamicStylesheet.addRule(selector, declaration);
+			} else if (typeof doc.createTextNode != UNDEF) {
+				dynamicStylesheet.appendChild(doc.createTextNode(selector + " {" + declaration + "}"));
 			}
 		}
 	}
