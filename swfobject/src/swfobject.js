@@ -53,9 +53,9 @@ var swfobject = function() {
 				plugin = true;
 				ie = false; // cascaded feature detection for Internet Explorer
 				d = d.replace(/^.*\s+(\S+\s+\S+$)/, "$1");
-				playerVersion[0] = parseInt(d.replace(/^(.*)\..*$/, "$1"), 10);
-				playerVersion[1] = parseInt(d.replace(/^.*\.(.*)\s.*$/, "$1"), 10);
-				playerVersion[2] = /[a-zA-Z]/.test(d) ? parseInt(d.replace(/^.*[a-zA-Z]+(.*)$/, "$1"), 10) : 0;
+				playerVersion[0] = toInt(d.replace(/^(.*)\..*$/, "$1"));
+				playerVersion[1] = toInt(d.replace(/^.*\.(.*)\s.*$/, "$1"));
+				playerVersion[2] = /[a-zA-Z]/.test(d) ? toInt(d.replace(/^.*[a-zA-Z]+(.*)$/, "$1")) : 0;
 			}
 		}
 		else if (typeof win.ActiveXObject != UNDEF) {
@@ -66,7 +66,7 @@ var swfobject = function() {
 					if (d) {
 						ie = true; // cascaded feature detection for Internet Explorer
 						d = d.split(" ")[1].split(",");
-						playerVersion = [parseInt(d[0], 10), parseInt(d[1], 10), parseInt(d[2], 10)];
+						playerVersion = [toInt(d[0]), toInt(d[1]), toInt(d[2])];
 					}
 				}
 			}
@@ -198,7 +198,7 @@ var swfobject = function() {
 						var d = t.GetVariable("$version");
 						if (d) {
 							d = d.split(" ")[1].split(",");
-							ua.pv = [parseInt(d[0], 10), parseInt(d[1], 10), parseInt(d[2], 10)];
+							ua.pv = [toInt(d[0]), toInt(d[1]), toInt(d[2])];
 						}
 					} catch(e){
 						//t.GetVariable("$version") is known to fail in Flash Player 8 on Firefox
@@ -363,8 +363,8 @@ var swfobject = function() {
 				storedFbContentId = replaceElemIdStr;
 			}
 			att.id = EXPRESS_INSTALL_ID;
-			if (typeof att.width == UNDEF || (!/%$/.test(att.width) && parseInt(att.width, 10) < 310)) { att.width = "310"; }
-			if (typeof att.height == UNDEF || (!/%$/.test(att.height) && parseInt(att.height, 10) < 137)) { att.height = "137"; }
+			if (typeof att.width == UNDEF || (!/%$/.test(att.width) && toInt(att.width) < 310)) { att.width = "310"; }
+			if (typeof att.height == UNDEF || (!/%$/.test(att.height) && toInt(att.height) < 137)) { att.height = "137"; }
 			doc.title = doc.title.slice(0, 47) + " - Flash Player Installation";
 			var pt = ua.ie ? "ActiveX" : "PlugIn",
 				fv = "MMredirectURL=" + encodeURIComponent(win.location.toString().replace(/&/g,"%26")) + "&MMplayerType=" + pt + "&MMdoctitle=" + doc.title;
@@ -561,6 +561,11 @@ var swfobject = function() {
 		return doc.createElement(el);
 	}
 
+	//To aid compression; replaces 14 instances of pareseInt with radix
+	function toInt(str){
+		return parseInt(str, 10);
+	}
+
 	/* Updated attachEvent function for Internet Explorer
 		- Stores attachEvent information in an Array, so on unload the detachEvent functions can be called to avoid memory leaks
 	*/
@@ -574,9 +579,9 @@ var swfobject = function() {
 	function hasPlayerVersion(rv) {
 		rv += ""; //Coerce number to string, if needed.
 		var pv = ua.pv, v = rv.split(".");
-		v[0] = parseInt(v[0], 10);
-		v[1] = parseInt(v[1], 10) || 0; // supports short notation, e.g. "9" instead of "9.0.0"
-		v[2] = parseInt(v[2], 10) || 0;
+		v[0] = toInt(v[0]);
+		v[1] = toInt(v[1]) || 0; // supports short notation, e.g. "9" instead of "9.0.0"
+		v[2] = toInt(v[2]) || 0;
 		return (pv[0] > v[0] || (pv[0] == v[0] && pv[1] > v[1]) || (pv[0] == v[0] && pv[1] == v[1] && pv[2] >= v[2])) ? true : false;
 	}
 
