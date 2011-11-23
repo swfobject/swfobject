@@ -349,10 +349,16 @@ var swfobject = function() {
 		- Reference: http://www.adobe.com/cfusion/knowledgebase/index.cfm?id=6a253b75
 	*/
 	function showExpressInstall(att, par, replaceElemIdStr, callbackFn) {
+
+		var obj = getElementById(replaceElemIdStr);
+
+		//Ensure that replaceElemIdStr is really a string and not an element
+		replaceElemIdStr = getId(replaceElemIdStr);
+
 		isExpressInstallActive = true;
 		storedCallbackFn = callbackFn || null;
 		storedCallbackObj = {success:false, id:replaceElemIdStr};
-		var obj = getElementById(replaceElemIdStr);
+
 		if (obj) {
 			if (obj.nodeName == "OBJECT") { // static publishing
 				storedFbContent = abstractFbContent(obj);
@@ -437,8 +443,13 @@ var swfobject = function() {
 	/* Cross-browser dynamic SWF creation
 	*/
 	function createSWF(attObj, parObj, id) {
+
 		var r, el = getElementById(id);
+
+		id = getId(id); // ensure id is truly an ID and not an element
+
 		if (ua.wk && ua.wk < 312) { return r; }
+
 		if (el) {
 
 			var o = (ua.ie) ? createElement("div") : createElement(OBJECT),
@@ -447,7 +458,7 @@ var swfobject = function() {
 				param;
 
 			if (typeof attObj.id == UNDEF) { // if no 'id' is defined for the object element, it will inherit the 'id' from the fallback content
-				attObj.id = isElement(id) ? id.id : id; //if id is an element, get the element's ID
+				attObj.id = id;
 			}
 
 			//Add params
@@ -540,6 +551,10 @@ var swfobject = function() {
 
 	function isElement(id){
 		return (id && id.nodeType && id.nodeType === 1);
+	}
+
+	function getId(thing){
+		return (isElement(thing)) ? thing.id : thing;
 	}
 
 	/* Functions to optimize JavaScript compression
@@ -690,9 +705,12 @@ var swfobject = function() {
 		},
 
 		embedSWF: function(swfUrlStr, replaceElemIdStr, widthStr, heightStr, swfVersionStr, xiSwfUrlStr, flashvarsObj, parObj, attObj, callbackFn) {
-			var callbackObj = {success:false, id:replaceElemIdStr};
+			
+			var id = getId(replaceElemIdStr),
+				callbackObj = {success:false, id:id};
+			
 			if (ua.w3 && !(ua.wk && ua.wk < 312) && swfUrlStr && replaceElemIdStr && widthStr && heightStr && swfVersionStr) {
-				setVisibility(replaceElemIdStr, false);
+				setVisibility(id, false);
 				addDomLoadEvent(function() {
 					widthStr += ""; // auto-convert to string
 					heightStr += "";
@@ -730,8 +748,8 @@ var swfobject = function() {
 					}
 					if (hasPlayerVersion(swfVersionStr)) { // create SWF
 						var obj = createSWF(att, par, replaceElemIdStr);
-						if (att.id == replaceElemIdStr) {
-							setVisibility(replaceElemIdStr, true);
+						if (att.id == id) {
+							setVisibility(id, true);
 						}
 						callbackObj.success = true;
 						callbackObj.ref = obj;
@@ -743,7 +761,7 @@ var swfobject = function() {
 						return;
 					}
 					else { // show fallback content
-						setVisibility(replaceElemIdStr, true);
+						setVisibility(id, true);
 					}
 					if (callbackFn) { callbackFn(callbackObj); }
 				});
