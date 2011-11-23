@@ -610,9 +610,9 @@ var swfobject = function() {
 		// add style rule
 		if(dynamicStylesheet){
 			if (typeof dynamicStylesheet.addRule != UNDEF) {
-				dynamicStylesheet.addRule(selector, declaration);
+				dynamicStylesheet.addRule(sel, decl);
 			} else if (typeof doc.createTextNode != UNDEF) {
-				dynamicStylesheet.appendChild(doc.createTextNode(selector + " {" + declaration + "}"));
+				dynamicStylesheet.appendChild(doc.createTextNode(sel + " {" + decl + "}"));
 			}
 		}
 	}
