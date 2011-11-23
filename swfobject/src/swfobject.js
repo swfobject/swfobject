@@ -619,11 +619,11 @@ var swfobject = function() {
 
 	function setVisibility(id, isVisible) {
 		if (!autoHideShow) { return; }
-		var v = isVisible ? "visible" : "hidden";
-		if (isDomLoaded && getElementById(id)) {
-			getElementById(id).style.visibility = v;
-		}
-		else {
+		var v = isVisible ? "visible" : "hidden",
+			el = getElementById(id);
+		if (isDomLoaded && el) {
+			el.style.visibility = v;
+		} else if(typeof id === "string"){
 			createCSS("#" + id, "visibility:" + v);
 		}
 	}
