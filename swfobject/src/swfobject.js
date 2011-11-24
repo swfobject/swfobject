@@ -1,4 +1,4 @@
-/*!    SWFObject v2.3 <http://github.com/swfobject/swfobject>
+/*!    SWFObject v2.3.20111123 <http://github.com/swfobject/swfobject>
     is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
 
@@ -829,6 +829,9 @@ var swfobject = function() {
                 }
                 isExpressInstallActive = false;
             }
-        }
+        },
+
+		version: "2.3"
+
     };
 }();
