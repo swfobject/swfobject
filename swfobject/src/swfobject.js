@@ -334,17 +334,6 @@ var swfobject = function() {
         return !isExpressInstallActive && hasPlayerVersion("6.0.65") && (ua.win || ua.mac) && !(ua.wk && ua.wk < 312);
     }
 
-    /* Utility function pulled out of showExpressInstall and displayFbContent for DRY reasons */
-    function removeIeObject(obj){
-        if(!obj){ return; }
-        if (obj.readyState == 4) {
-            obj.parentNode.removeChild(obj);
-        }
-        else {
-            setTimeout(function (){ removeIeObject(obj); }, 10);
-        }
-    }
-
     /* Show the Adobe Express Install dialog
         - Reference: http://www.adobe.com/cfusion/knowledgebase/index.cfm?id=6a253b75
     */
@@ -388,7 +377,7 @@ var swfobject = function() {
                 newObj.setAttribute("id", replaceElemIdStr);
                 obj.parentNode.insertBefore(newObj, obj); // insert placeholder div that will be replaced by the object element that loads expressinstall.swf
                 obj.style.display = "none";
-                removeIeObject(obj);
+                removeSWF(obj); //removeSWF accepts elements now
             }
             createSWF(att, par, replaceElemIdStr);
         }
@@ -404,7 +393,7 @@ var swfobject = function() {
             var el = createElement("div");
             obj.parentNode.insertBefore(el, obj); // insert placeholder div that will be replaced by the fallback content
             el.parentNode.replaceChild(abstractFbContent(obj), el);
-            removeIeObject(obj);
+            removeSWF(obj); //removeSWF accepts elements now
         }
         else {
             obj.parentNode.replaceChild(abstractFbContent(obj), obj);
@@ -524,9 +513,14 @@ var swfobject = function() {
                 obj.style.display = "none";
                 (function removeSWFInIE(){
                     if (obj.readyState == 4) {
-                        removeObjectInIE(id);
-                    }
-                    else {
+						//This step prevents memory leaks in Internet Explorer
+			            for (var i in obj) {
+			                if (typeof obj[i] == "function") {
+			                    obj[i] = null;
+			                }
+			            }
+			            obj.parentNode.removeChild(obj);
+                    } else {
                         setTimeout(removeSWFInIE, 10);
                     }
                 }());
@@ -534,18 +528,6 @@ var swfobject = function() {
             else {
                 obj.parentNode.removeChild(obj);
             }
-        }
-    }
-
-    function removeObjectInIE(id) {
-        var obj = getElementById(id);
-        if (obj) {
-            for (var i in obj) {
-                if (typeof obj[i] == "function") {
-                    obj[i] = null;
-                }
-            }
-            obj.parentNode.removeChild(obj);
         }
     }
 
@@ -705,10 +687,10 @@ var swfobject = function() {
         },
 
         embedSWF: function(swfUrlStr, replaceElemIdStr, widthStr, heightStr, swfVersionStr, xiSwfUrlStr, flashvarsObj, parObj, attObj, callbackFn) {
-            
+
             var id = getId(replaceElemIdStr),
                 callbackObj = {success:false, id:id};
-            
+
             if (ua.w3 && !(ua.wk && ua.wk < 312) && swfUrlStr && replaceElemIdStr && widthStr && heightStr && swfVersionStr) {
                 setVisibility(id, false);
                 addDomLoadEvent(function() {
