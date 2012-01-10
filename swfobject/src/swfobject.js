@@ -299,7 +299,7 @@ var swfobject = function() {
         var r = null,
             o = getElementById(objectIdStr);
 
-        if (o && o.nodeName === "OBJECT") {
+        if (o && o.nodeName.toUpperCase() === "OBJECT") {
 
             //If targeted object is valid Flash file
             if (typeof o.SetVariable !== UNDEF){
@@ -349,7 +349,7 @@ var swfobject = function() {
         storedCallbackObj = {success:false, id:replaceElemIdStr};
 
         if (obj) {
-            if (obj.nodeName == "OBJECT") { // static publishing
+            if (obj.nodeName.toUpperCase() == "OBJECT") { // static publishing
                 storedFbContent = abstractFbContent(obj);
                 storedFbContentId = null;
             }
@@ -508,7 +508,7 @@ var swfobject = function() {
     */
     function removeSWF(id) {
         var obj = getElementById(id);
-        if (obj && obj.nodeName == "OBJECT") {
+        if (obj && obj.nodeName.toUpperCase() == "OBJECT") {
             if (ua.ie) {
                 obj.style.display = "none";
                 (function removeSWFInIE(){
