@@ -2,7 +2,15 @@
     is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
 
-var swfobject = function() {
+(function (root, factory) {
+    if (typeof module !== 'undefined') {
+        module.exports = factory();
+    } else if (typeof define === 'function' && typeof define.amd !== 'undefined') {
+        define(factory);
+    } else {
+        root.swfobject = factory();
+    }
+}(this, function () {
 
     var UNDEF = "undefined",
         OBJECT = "object",
@@ -834,4 +842,4 @@ var swfobject = function() {
 		version: "2.3"
 
     };
-}();
+}));
