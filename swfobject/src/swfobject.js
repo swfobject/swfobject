@@ -1,6 +1,7 @@
 /*!    SWFObject v2.3.20120118 <http://github.com/swfobject/swfobject>
     is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
+(function (global) {
 
 var swfobject = function() {
 
@@ -834,4 +835,22 @@ var swfobject = function() {
 		version: "2.3"
 
     };
-}();
+};
+
+// Check if in an AMD environment
+if (typeof define === "function" && define.amd) {
+    // Check if in a windowed AMD environment
+    if (global.window) {
+    	define("swfobject", [], function () {
+       	    return swfobject();
+   	});	
+    } else {
+    	// Not in a windowed AMD environment, return null so developer can mock this dep
+    	return null;
+    }
+} else { // Assign swfobject to global scope 
+    global['swfobject'] = swfobject();
+}
+
+})(this);
+
