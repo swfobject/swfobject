@@ -360,9 +360,8 @@ var swfobject = function() {
             att.id = EXPRESS_INSTALL_ID;
             if (typeof att.width == UNDEF || (!/%$/.test(att.width) && toInt(att.width) < 310)) { att.width = "310"; }
             if (typeof att.height == UNDEF || (!/%$/.test(att.height) && toInt(att.height) < 137)) { att.height = "137"; }
-            doc.title = doc.title.slice(0, 47) + " - Flash Player Installation";
             var pt = ua.ie ? "ActiveX" : "PlugIn",
-                fv = "MMredirectURL=" + encodeURIComponent(win.location.toString().replace(/&/g,"%26")) + "&MMplayerType=" + pt + "&MMdoctitle=" + doc.title;
+                fv = "MMredirectURL=" + encodeURIComponent(win.location.toString().replace(/&/g,"%26")) + "&MMplayerType=" + pt + "&MMdoctitle=" + encodeURIComponent(doc.title.slice(0, 47) + " - Flash Player Installation");
             if (typeof par.flashvars != UNDEF) {
                 par.flashvars += "&" + fv;
             }
