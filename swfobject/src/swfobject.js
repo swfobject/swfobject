@@ -37,7 +37,7 @@ var swfobject = function() {
         - Is executed directly for optimal performance
     */
     ua = function() {
-        var w3cdom = typeof doc.getElementById != UNDEF && typeof doc.getElementsByTagName != UNDEF && typeof doc.createElement != UNDEF,
+        var w3cdom = typeof doc.getElementById !== UNDEF && typeof doc.getElementsByTagName !== UNDEF && typeof doc.createElement !== UNDEF,
             u = nav.userAgent.toLowerCase(),
             p = nav.platform.toLowerCase(),
             windows = p ? /win/.test(p) : /win/.test(u),
@@ -46,10 +46,10 @@ var swfobject = function() {
             ie = nav.appName === "Microsoft Internet Explorer",
             playerVersion = [0,0,0],
             d = null;
-        if (typeof nav.plugins != UNDEF && typeof nav.plugins[SHOCKWAVE_FLASH] == OBJECT) {
+        if (typeof nav.plugins !== UNDEF && typeof nav.plugins[SHOCKWAVE_FLASH] === OBJECT) {
             d = nav.plugins[SHOCKWAVE_FLASH].description;
             // nav.mimeTypes["application/x-shockwave-flash"].enabledPlugin indicates whether plug-ins are enabled or disabled in Safari 3+
-            if (d && (typeof nav.mimeTypes != UNDEF && nav.mimeTypes[FLASH_MIME_TYPE] && nav.mimeTypes[FLASH_MIME_TYPE].enabledPlugin)){
+            if (d && (typeof nav.mimeTypes !== UNDEF && nav.mimeTypes[FLASH_MIME_TYPE] && nav.mimeTypes[FLASH_MIME_TYPE].enabledPlugin)){
                 plugin = true;
                 ie = false; // cascaded feature detection for Internet Explorer
                 d = d.replace(/^.*\s+(\S+\s+\S+$)/, "$1");
@@ -58,7 +58,7 @@ var swfobject = function() {
                 playerVersion[2] = /[a-zA-Z]/.test(d) ? toInt(d.replace(/^.*[a-zA-Z]+(.*)$/, "$1")) : 0;
             }
         }
-        else if (typeof win.ActiveXObject != UNDEF) {
+        else if (typeof win.ActiveXObject !== UNDEF) {
             try {
                 var a = new ActiveXObject(SHOCKWAVE_FLASH_AX);
                 if (a) { // a will return null when ActiveX is disabled
@@ -82,16 +82,16 @@ var swfobject = function() {
     */
     onDomLoad = function() {
         if (!ua.w3) { return; }
-        if ((typeof doc.readyState != UNDEF && (doc.readyState === "complete" || doc.readyState === "interactive")) || (typeof doc.readyState == UNDEF && (doc.getElementsByTagName("body")[0] || doc.body))) { // function is fired after onload, e.g. when script is inserted dynamically
+        if ((typeof doc.readyState !== UNDEF && (doc.readyState === "complete" || doc.readyState === "interactive")) || (typeof doc.readyState === UNDEF && (doc.getElementsByTagName("body")[0] || doc.body))) { // function is fired after onload, e.g. when script is inserted dynamically
             callDomLoadFunctions();
         }
         if (!isDomLoaded) {
-            if (typeof doc.addEventListener != UNDEF) {
+            if (typeof doc.addEventListener !== UNDEF) {
                 doc.addEventListener("DOMContentLoaded", callDomLoadFunctions, false);
             }
             if (ua.ie) {
                 doc.attachEvent(ON_READY_STATE_CHANGE, function detach() {
-                    if (doc.readyState == "complete") {
+                    if (doc.readyState === "complete") {
                         doc.detachEvent(ON_READY_STATE_CHANGE, detach);
                         callDomLoadFunctions();
                     }
@@ -155,16 +155,16 @@ var swfobject = function() {
         - Will fire an event as soon as a web page including all of its assets are loaded
      */
     function addLoadEvent(fn) {
-        if (typeof win.addEventListener != UNDEF) {
+        if (typeof win.addEventListener !== UNDEF) {
             win.addEventListener("load", fn, false);
         }
-        else if (typeof doc.addEventListener != UNDEF) {
+        else if (typeof doc.addEventListener !== UNDEF) {
             doc.addEventListener("load", fn, false);
         }
-        else if (typeof win.attachEvent != UNDEF) {
+        else if (typeof win.attachEvent !== UNDEF) {
             addListener(win, "onload", fn);
         }
-        else if (typeof win.onload == "function") {
+        else if (typeof win.onload === "function") {
             var fnOld = win.onload;
             win.onload = function() {
                 fnOld();
@@ -193,7 +193,7 @@ var swfobject = function() {
         if (t) {
             var counter = 0;
             (function checkGetVariable(){
-                if (typeof t.GetVariable != UNDEF) {
+                if (typeof t.GetVariable !== UNDEF) {
                     try {
                         var d = t.GetVariable("$version");
                         if (d) {
@@ -270,7 +270,7 @@ var swfobject = function() {
                     setVisibility(id, true);
                     if (cb) {
                         var o = getObjectById(id); // test whether there is an HTML object element or not
-                        if (o && typeof o.SetVariable != UNDEF) {
+                        if (o && typeof o.SetVariable !== UNDEF) {
                             cbObj.success = true;
                             cbObj.ref = o;
                             cbObj.id = o.id;
@@ -349,7 +349,7 @@ var swfobject = function() {
         storedCallbackObj = {success:false, id:replaceElemIdStr};
 
         if (obj) {
-            if (obj.nodeName.toUpperCase() == "OBJECT") { // static publishing
+            if (obj.nodeName.toUpperCase() === "OBJECT") { // static publishing
                 storedFbContent = abstractFbContent(obj);
                 storedFbContentId = null;
             }
@@ -358,11 +358,11 @@ var swfobject = function() {
                 storedFbContentId = replaceElemIdStr;
             }
             att.id = EXPRESS_INSTALL_ID;
-            if (typeof att.width == UNDEF || (!/%$/.test(att.width) && toInt(att.width) < 310)) { att.width = "310"; }
-            if (typeof att.height == UNDEF || (!/%$/.test(att.height) && toInt(att.height) < 137)) { att.height = "137"; }
+            if (typeof att.width === UNDEF || (!/%$/.test(att.width) && toInt(att.width) < 310)) { att.width = "310"; }
+            if (typeof att.height === UNDEF || (!/%$/.test(att.height) && toInt(att.height) < 137)) { att.height = "137"; }
             var pt = ua.ie ? "ActiveX" : "PlugIn",
                 fv = "MMredirectURL=" + encodeURIComponent(win.location.toString().replace(/&/g,"%26")) + "&MMplayerType=" + pt + "&MMdoctitle=" + encodeURIComponent(doc.title.slice(0, 47) + " - Flash Player Installation");
-            if (typeof par.flashvars != UNDEF) {
+            if (typeof par.flashvars !== UNDEF) {
                 par.flashvars += "&" + fv;
             }
             else {
@@ -411,7 +411,7 @@ var swfobject = function() {
                 if (c) {
                     var cl = c.length;
                     for (var i = 0; i < cl; i++) {
-                        if (!(c[i].nodeType == 1 && c[i].nodeName == "PARAM") && !(c[i].nodeType == 8)) {
+                        if (!(c[i].nodeType == 1 && c[i].nodeName === "PARAM") && !(c[i].nodeType == 8)) {
                             ac.appendChild(c[i].cloneNode(true));
                         }
                     }
@@ -445,7 +445,7 @@ var swfobject = function() {
                 attr_lower,
                 param;
 
-            if (typeof attObj.id == UNDEF) { // if no 'id' is defined for the object element, it will inherit the 'id' from the fallback content
+            if (typeof attObj.id === UNDEF) { // if no 'id' is defined for the object element, it will inherit the 'id' from the fallback content
                 attObj.id = id;
             }
 
@@ -507,14 +507,14 @@ var swfobject = function() {
     */
     function removeSWF(id) {
         var obj = getElementById(id);
-        if (obj && obj.nodeName.toUpperCase() == "OBJECT") {
+        if (obj && obj.nodeName.toUpperCase() === "OBJECT") {
             if (ua.ie) {
                 obj.style.display = "none";
                 (function removeSWFInIE(){
                     if (obj.readyState == 4) {
 						//This step prevents memory leaks in Internet Explorer
 			            for (var i in obj) {
-			                if (typeof obj[i] == "function") {
+			                if (typeof obj[i] === "function") {
 			                    obj[i] = null;
 			                }
 			            }
@@ -587,7 +587,7 @@ var swfobject = function() {
     function createCSS(sel, decl, media, newStyle) {
         var h = doc.getElementsByTagName("head")[0];
         if (!h) { return; } // to also support badly authored HTML pages that lack a head element
-        var m = (typeof media == "string") ? media : "screen";
+        var m = (typeof media === "string") ? media : "screen";
         if (newStyle) {
             dynamicStylesheet = null;
             dynamicStylesheetMedia = null;
@@ -598,16 +598,16 @@ var swfobject = function() {
             s.setAttribute("type", "text/css");
             s.setAttribute("media", m);
             dynamicStylesheet = h.appendChild(s);
-            if (ua.ie && typeof doc.styleSheets != UNDEF && doc.styleSheets.length > 0) {
+            if (ua.ie && typeof doc.styleSheets !== UNDEF && doc.styleSheets.length > 0) {
                 dynamicStylesheet = doc.styleSheets[doc.styleSheets.length - 1];
             }
             dynamicStylesheetMedia = m;
         }
         // add style rule
         if(dynamicStylesheet){
-            if (typeof dynamicStylesheet.addRule != UNDEF) {
+            if (typeof dynamicStylesheet.addRule !== UNDEF) {
                 dynamicStylesheet.addRule(sel, decl);
-            } else if (typeof doc.createTextNode != UNDEF) {
+            } else if (typeof doc.createTextNode !== UNDEF) {
                 dynamicStylesheet.appendChild(doc.createTextNode(sel + " {" + decl + "}"));
             }
         }
@@ -628,8 +628,8 @@ var swfobject = function() {
     */
     function urlEncodeIfNecessary(s) {
         var regex = /[\\\"<>\.;]/;
-        var hasBadChars = regex.exec(s) != null;
-        return hasBadChars && typeof encodeURIComponent != UNDEF ? encodeURIComponent(s) : s;
+        var hasBadChars = regex.exec(s) !== null;
+        return hasBadChars && typeof encodeURIComponent !== UNDEF ? encodeURIComponent(s) : s;
     }
 
     /* Release memory to avoid memory leaks caused by closures, fix hanging audio/video threads and force open sockets/NetConnections to disconnect (Internet Explorer only)
@@ -717,7 +717,7 @@ var swfobject = function() {
                                 var key = (encodeURI_enabled) ? encodeURIComponent(k) : k,
                                     value = (encodeURI_enabled) ? encodeURIComponent(flashvarsObj[k]) : flashvarsObj[k];
 
-                                if (typeof par.flashvars != UNDEF) {
+                                if (typeof par.flashvars !== UNDEF) {
                                     par.flashvars += "&" + key + "=" + value;
                                 }
                                 else {
@@ -801,7 +801,7 @@ var swfobject = function() {
             var q = doc.location.search || doc.location.hash;
             if (q) {
                 if (/\?/.test(q)) { q = q.split("?")[1]; } // strip question mark
-                if (param == null) {
+                if (param === null) {
                     return urlEncodeIfNecessary(q);
                 }
                 var pairs = q.split("&");
