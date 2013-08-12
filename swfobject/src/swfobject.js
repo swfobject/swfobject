@@ -512,13 +512,13 @@ var swfobject = function() {
                 obj.style.display = "none";
                 (function removeSWFInIE(){
                     if (obj.readyState == 4) {
-						//This step prevents memory leaks in Internet Explorer
-			            for (var i in obj) {
-			                if (typeof obj[i] === "function") {
-			                    obj[i] = null;
-			                }
-			            }
-			            obj.parentNode.removeChild(obj);
+                      //This step prevents memory leaks in Internet Explorer
+                      for (var i in obj) {
+                        if (typeof obj[i] === "function") {
+                          obj[i] = null;
+                        }
+                      }
+                      obj.parentNode.removeChild(obj);
                     } else {
                         setTimeout(removeSWFInIE, 10);
                     }
@@ -830,7 +830,7 @@ var swfobject = function() {
             }
         },
 
-		version: "2.3"
+        version: "2.3"
 
     };
 }();
