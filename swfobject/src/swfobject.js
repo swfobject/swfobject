@@ -2,6 +2,8 @@
     is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
 
+/* global ActiveXObject: false */
+
 var swfobject = function () {
 
     var UNDEF = "undefined",
