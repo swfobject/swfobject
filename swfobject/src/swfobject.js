@@ -176,7 +176,6 @@ var swfobject = function () {
         }
     }
 
-
     /* Detect the Flash Player version for non-Internet Explorer browsers
         - Detecting the plug-in version via the object element is more precise than using the plugins collection item's description:
           a. Both release and build numbers can be detected
@@ -413,7 +412,6 @@ var swfobject = function () {
         return ac;
     }
 
-
     function createIeObject(url, paramStr) {
         var div = createElement("div");
         div.innerHTML = "<object classid='clsid:D27CDB6E-AE6D-11cf-96B8-444553540000'><param name='movie' value='" + url + "'>" + paramStr + "</object>";
@@ -476,7 +474,6 @@ var swfobject = function () {
 
         return r;
     }
-
 
     function createObjParam(el, pName, pValue) {
         var p = createElement("param");
