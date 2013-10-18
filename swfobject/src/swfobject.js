@@ -783,7 +783,7 @@ var swfobject = function () {
             var q = doc.location.search || doc.location.hash;
             if (q) {
                 if (/\?/.test(q)) { q = q.split("?")[1]; } // strip question mark
-                if (param === null) {
+                if (!param) {
                     return urlEncodeIfNecessary(q);
                 }
                 var pairs = q.split("&");
