@@ -1,0 +1,37 @@
+{
+  "name": "SWFObject",
+  "description": "SWFObject",
+  "version": "2.3-beta+rc1",
+  "homepage": "http://github.com/swfobject/swfobject",
+  "licenses": [{
+    "type": "is released under the MIT License",
+    "url": "http://www.opensource.org/licenses/mit-license.php"
+  }],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:michsch/swfobject.git"
+  },
+  "bugs": {
+    "url": "https://github.com/swfobject/swfobject/issues"
+  },
+  "scripts": {
+    "test": "grunt test --verbose"
+  },
+  "main": "Gruntfile.js",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-jshint": "~0.8.0",
+    "grunt-contrib-uglify": "~0.3.2",
+    "grunt-contrib-watch": "~0.5.3",
+    "load-grunt-config": "~0.7.1",
+    "load-grunt-tasks": "~0.3.0",
+    "time-grunt": "~0.2.9"
+  },
+  "keywords": [
+    "website"
+  ],
+  "engines": {
+    "node": ">=0.8"
+  }
+}
