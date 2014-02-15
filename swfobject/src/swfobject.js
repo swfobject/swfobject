@@ -4,7 +4,7 @@
 
 /* global ActiveXObject: false */
 
-var swfobject = function () {
+var swfobject = (function () {
 
     var UNDEF = "undefined",
         OBJECT = "object",
@@ -38,7 +38,7 @@ var swfobject = function () {
         - User agent string detection is only used when no good alternative is possible
         - Is executed directly for optimal performance
     */
-    ua = function () {
+    ua = (function () {
         var w3cdom = typeof doc.getElementById !== UNDEF && typeof doc.getElementsByTagName !== UNDEF && typeof doc.createElement !== UNDEF,
             u = nav.userAgent.toLowerCase(),
             p = nav.platform.toLowerCase(),
@@ -75,14 +75,14 @@ var swfobject = function () {
             catch (e) {}
         }
         return {w3: w3cdom, pv: playerVersion, wk: webkit, ie: ie, win: windows, mac: mac};
-    }(),
+    })(),
 
     /* Cross-browser onDomLoad
         - Will fire an event as soon as the DOM of a web page is loaded
         - Internet Explorer workaround based on Diego Perini's solution: http://javascript.nwbox.com/IEContentLoaded/
         - Regular onload serves as fallback
     */
-    onDomLoad = function () {
+    onDomLoad = (function () {
         if (!ua.w3) { return; }
         if ((typeof doc.readyState !== UNDEF && (doc.readyState === "complete" || doc.readyState === "interactive")) || (typeof doc.readyState === UNDEF && (doc.getElementsByTagName("body")[0] || doc.body))) { // function is fired after onload, e.g. when script is inserted dynamically
             callDomLoadFunctions();
@@ -98,7 +98,7 @@ var swfobject = function () {
                         callDomLoadFunctions();
                     }
                 });
-                if (win == top) { // if not inside an iframe
+                if (win === top) { // if not inside an iframe
                     (function checkDomLoadedIE() {
                         if (isDomLoaded) { return; }
                         try {
@@ -123,7 +123,7 @@ var swfobject = function () {
                 }());
             }
         }
-    }();
+    })();
 
     function callDomLoadFunctions() {
         if (isDomLoaded || !document.getElementsByTagName("body")[0]) { return; }
@@ -363,7 +363,7 @@ var swfobject = function () {
             }
             // IE only: when a SWF is loading (AND: not available in cache) wait for the readyState of the object element to become 4 before removing it,
             // because you cannot properly cancel a loading SWF file without breaking browser load references, also obj.onreadystatechange doesn't work
-            if (ua.ie && obj.readyState != 4) {
+            if (ua.ie && obj.readyState !== 4) {
                 var newObj = createElement("div");
                 replaceElemIdStr += "SWFObjectNew";
                 newObj.setAttribute("id", replaceElemIdStr);
@@ -378,7 +378,7 @@ var swfobject = function () {
     /* Functions to abstract and display fallback content
     */
     function displayFbContent(obj) {
-        if (ua.ie && obj.readyState != 4) {
+        if (ua.ie && obj.readyState !== 4) {
             // IE only: when a SWF is loading (AND: not available in cache) wait for the readyState of the object element to become 4 before removing it,
             // because you cannot properly cancel a loading SWF file without breaking browser load references, also obj.onreadystatechange doesn't work
             obj.style.display = "none";
@@ -404,7 +404,7 @@ var swfobject = function () {
                 if (c) {
                     var cl = c.length;
                     for (var i = 0; i < cl; i++) {
-                        if (!(c[i].nodeType == 1 && c[i].nodeName === "PARAM") && !(c[i].nodeType == 8)) {
+                        if (!(c[i].nodeType === 1 && c[i].nodeName === "PARAM") && (c[i].nodeType === 8) === false) {
                             ac.appendChild(c[i].cloneNode(true));
                         }
                     }
@@ -493,7 +493,7 @@ var swfobject = function () {
             if (ua.ie) {
                 obj.style.display = "none";
                 (function removeSWFInIE() {
-                    if (obj.readyState == 4) {
+                    if (obj.readyState === 4) {
                         //This step prevents memory leaks in Internet Explorer
                         for (var i in obj) {
                             if (typeof obj[i] === "function") {
@@ -560,7 +560,7 @@ var swfobject = function () {
         v[0] = toInt(v[0]);
         v[1] = toInt(v[1]) || 0; // supports short notation, e.g. "9" instead of "9.0.0"
         v[2] = toInt(v[2]) || 0;
-        return (pv[0] > v[0] || (pv[0] == v[0] && pv[1] > v[1]) || (pv[0] == v[0] && pv[1] == v[1] && pv[2] >= v[2])) ? true : false;
+        return (pv[0] > v[0] || (pv[0] === v[0] && pv[1] > v[1]) || (pv[0] === v[0] && pv[1] === v[1] && pv[2] >= v[2])) ? true : false;
     }
 
     /* Cross-browser dynamic CSS creation
@@ -574,7 +574,7 @@ var swfobject = function () {
             dynamicStylesheet = null;
             dynamicStylesheetMedia = null;
         }
-        if (!dynamicStylesheet || dynamicStylesheetMedia != m) {
+        if (!dynamicStylesheet || dynamicStylesheetMedia !== m) {
             // create dynamic stylesheet + get a global reference to it
             var s = createElement("style");
             s.setAttribute("type", "text/css");
@@ -616,7 +616,7 @@ var swfobject = function () {
 
     /* Release memory to avoid memory leaks caused by closures, fix hanging audio/video threads and force open sockets/NetConnections to disconnect (Internet Explorer only)
     */
-    var cleanup = function () {
+    var cleanup = (function () {
         if (ua.ie) {
             window.attachEvent("onunload", function () {
                 // remove listeners to avoid memory leaks
@@ -640,7 +640,7 @@ var swfobject = function () {
                 swfobject = null;
             });
         }
-    }();
+    })();
 
     return {
         /* Public API
@@ -711,7 +711,7 @@ var swfobject = function () {
                     }
                     if (hasPlayerVersion(swfVersionStr)) { // create SWF
                         var obj = createSWF(att, par, replaceElemIdStr);
-                        if (att.id == id) {
+                        if (att.id === id) {
                             setVisibility(id, true);
                         }
                         callbackObj.success = true;
@@ -788,7 +788,7 @@ var swfobject = function () {
                 }
                 var pairs = q.split("&");
                 for (var i = 0; i < pairs.length; i++) {
-                    if (pairs[i].substring(0, pairs[i].indexOf("=")) == param) {
+                    if (pairs[i].substring(0, pairs[i].indexOf("=")) === param) {
                         return urlEncodeIfNecessary(pairs[i].substring((pairs[i].indexOf("=") + 1)));
                     }
                 }
@@ -815,4 +815,4 @@ var swfobject = function () {
         version: "2.3"
 
     };
-}();
+})();
