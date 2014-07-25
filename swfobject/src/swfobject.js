@@ -60,7 +60,7 @@ var swfobject = function () {
                 playerVersion[2] = /[a-zA-Z]/.test(d) ? toInt(d.replace(/^.*[a-zA-Z]+(.*)$/, "$1")) : 0;
             }
         }
-        else if (typeof win.ActiveXObject !== UNDEF) {
+        else {
             try {
                 var a = new ActiveXObject(SHOCKWAVE_FLASH_AX);
                 if (a) { // a will return null when ActiveX is disabled
