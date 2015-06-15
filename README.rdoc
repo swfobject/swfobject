@@ -1,12 +1,13 @@
+= --- IMPORTANT UPDATE ---
+
+SWFObject is no longer in active development. Flash Player is on the decline, and the authors of SWFObject have moved on to other projects. This project is being left on GitHub for historical purposes.
+
 = SWFObject
 
 SWFObject is a free, open-source tool for embedding swf content in websites.
 
 This GitHub edition of SWFObject is our 2.3 beta. The current release -- 2.2 -- is still available for download at http://code.google.com/p/swfobject/
 
-When 2.3 is made official, we plan to make this GitHub site SWFObject's permanent home.
-
-Since SWFObject 2.3 is in beta, it could very likely have bugs. Please test throughly by visiting http://testsuite.learnswfobject.com/2.3b/ and/or by using the 2.3 beta code in your own projects.  Please use the *uncompressed* version of SWFObject until we have ensured there are no bugs.
 
 == CHANGES
 SWFObject 2.3 introduces many small changes under the hood (almost exclusively aimed at fixing bugs), but the public API is mostly unchanged and completely backwards compatible with SWFObject 2.2.  The only two significant changes to the API: 
