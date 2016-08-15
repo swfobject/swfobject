@@ -434,6 +434,10 @@ var swfobject = function () {
                 attrLower,
                 param;
 
+            if (typeof o.name === UNDEF) {
+                o.setAttribute("name", id);
+            }
+
             if (typeof attObj.id === UNDEF) { // if no 'id' is defined for the object element, it will inherit the 'id' from the fallback content
                 attObj.id = id;
             }
