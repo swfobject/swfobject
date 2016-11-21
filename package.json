@@ -1,0 +1,20 @@
+{
+  "name": "swfobject",
+  "version": "2.3.0",
+  "description": "SWFObject is a free, open-source tool for embedding swf content in websites.",
+  "main": "swfobject/swfobject.js",
+  "scripts": {
+    "test": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/swfobject/swfobject.git"
+  },
+  "keywords": [
+    "swfobject",
+    "flash"
+  ],
+  "author": "FIXME",
+  "license": "FIXME",
+  "readmeFilename": "README.rdoc"
+}
