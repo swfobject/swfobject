@@ -634,10 +634,14 @@ var swfobject = function () {
                     ua[k] = null;
                 }
                 ua = null;
-                for (var l in swfobject) {
-                    swfobject[l] = null;
+
+                if (window.swfobject)
+                {
+                    for (var l in swfobject) {
+                        swfobject[l] = null;
+                    }
+                    swfobject = null;
                 }
-                swfobject = null;
             });
         }
     }();
