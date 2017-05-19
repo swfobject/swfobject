@@ -709,7 +709,7 @@ var swfobject = function () {
                             }
                         }
                     }
-                    if (hasPlayerVersion(swfVersionStr)) { // create SWF
+                    try { // create SWF
                         var obj = createSWF(att, par, replaceElemIdStr);
                         if (att.id == id) {
                             setVisibility(id, true);
@@ -717,13 +717,7 @@ var swfobject = function () {
                         callbackObj.success = true;
                         callbackObj.ref = obj;
                         callbackObj.id = obj.id;
-                    }
-                    else if (xiSwfUrlStr && canExpressInstall()) { // show Adobe Express Install
-                        att.data = xiSwfUrlStr;
-                        showExpressInstall(att, par, replaceElemIdStr, callbackFn);
-                        return;
-                    }
-                    else { // show fallback content
+                    } catch (e) { // show fallback content
                         setVisibility(id, true);
                     }
                     if (callbackFn) { callbackFn(callbackObj); }
